@@ -1,0 +1,2767 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wave Designer Pro - 智能水处理系统设计平台</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary: #2563eb; --primary-dark: #1d4ed8; --primary-light: #dbeafe; --secondary: #0ea5e9; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --dark: #1e293b; --gray: #64748b; --light-gray: #f1f5f9; --border: #e2e8f0; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1); --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; color: var(--dark); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 20px 30px; margin-bottom: 20px; box-shadow: var(--shadow-lg); display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; }
+        .logo-text h1 { font-size: 24px; font-weight: 700; }
+        .logo-text p { font-size: 13px; color: var(--gray); }
+        .btn { padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        .btn-secondary { background: var(--light-gray); color: var(--dark); border: 1px solid var(--border); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-group { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); }
+        .progress-bar { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 24px 30px; margin-bottom: 20px; box-shadow: var(--shadow); }
+        .steps { display: flex; justify-content: space-between; position: relative; }
+        .steps::before { content: ''; position: absolute; top: 20px; left: 60px; right: 60px; height: 3px; background: var(--border); z-index: 0; }
+        .step { display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 1; cursor: pointer; }
+        .step-number { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 16px; background: white; border: 3px solid var(--border); color: var(--gray); }
+        .step.active .step-number { background: var(--primary); border-color: var(--primary); color: white; }
+        .step.completed .step-number { background: var(--success); border-color: var(--success); color: white; }
+        .step-label { font-size: 13px; font-weight: 500; color: var(--gray); text-align: center; }
+        .step.active .step-label { color: var(--primary); font-weight: 600; }
+        .main-content { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 30px; box-shadow: var(--shadow-lg); min-height: 600px; }
+        .step-content { animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .step-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .step-subtitle { color: var(--gray); margin-bottom: 24px; }
+        .upload-section { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .upload-card { border: 2px dashed var(--border); border-radius: 16px; padding: 40px; text-align: center; cursor: pointer; background: var(--light-gray); }
+        .upload-card:hover { border-color: var(--primary); background: var(--primary-light); }
+        .upload-card.has-file { border-color: var(--success); background: #ecfdf5; }
+        .upload-icon { font-size: 48px; color: var(--primary); margin-bottom: 16px; }
+        .wq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px; }
+        .wq-card { background: var(--light-gray); border-radius: 12px; padding: 20px; border: 1px solid var(--border); }
+        .wq-card-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+        .form-input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; }
+        .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+        .input-with-unit { position: relative; }
+        .input-unit { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--gray); font-size: 13px; }
+        .tabs { display: flex; gap: 4px; background: var(--light-gray); padding: 4px; border-radius: 10px; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: var(--gray); }
+        .tab.active { background: white; color: var(--primary); box-shadow: var(--shadow); }
+        .ai-result { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 24px; color: white; margin: 20px 0; }
+        .membrane-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 24px; }
+        .membrane-card { border: 2px solid var(--border); border-radius: 16px; padding: 20px; cursor: pointer; background: white; }
+        .membrane-card:hover { border-color: var(--primary); }
+        .membrane-card.selected { border-color: var(--primary); background: var(--primary-light); }
+        .membrane-brand { font-size: 12px; color: var(--primary); font-weight: 600; }
+        .membrane-model { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+        .membrane-specs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 13px; }
+        .pump-list { display: grid; gap: 12px; }
+        .pump-item { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: var(--light-gray); border-radius: 12px; border: 2px solid transparent; cursor: pointer; }
+        .pump-item.selected { border-color: var(--primary); background: var(--primary-light); }
+        .pump-icon { width: 48px; height: 48px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--primary); }
+        .pump-info { flex: 1; }
+        .flow-diagram { background: var(--light-gray); border-radius: 16px; padding: 30px; overflow-x: auto; }
+        .flow-container { display: flex; align-items: center; gap: 20px; min-width: max-content; }
+        .flow-node { background: white; border-radius: 12px; padding: 16px 24px; text-align: center; min-width: 120px; box-shadow: var(--shadow); }
+        .flow-node.primary { border: 2px solid var(--primary); background: var(--primary-light); }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 24px; }
+        .summary-card { background: var(--light-gray); border-radius: 12px; padding: 20px; }
+        .summary-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .loading-spinner { width: 60px; height: 60px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="header">
+                <div class="logo">
+                    <div class="logo-icon"><i class="fas fa-water"></i></div>
+                    <div class="logo-text"><h1>Wave Designer Pro</h1><p>智能水处理系统设计平台</p></div>
+                </div>
+                <div><button class="btn btn-secondary" @click="resetAll"><i class="fas fa-redo"></i> 重置</button></div>
+            </div>
+            <div class="progress-bar">
+                <div class="steps">
+                    <div v-for="(step, index) in steps" :key="index" class="step" :class="{ active: currentStep === index, completed: currentStep > index }" @click="goToStep(index)">
+                        <div class="step-number"><i v-if="currentStep > index" class="fas fa-check"></i><span v-else>{{ index + 1 }}</span></div>
+                        <span class="step-label">{{ step.label }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="main-content">
+                <!-- Step 1: Water Quality -->
+                <div v-if="currentStep === 0" class="step-content">
+                    <h2 class="step-title"><i class="fas fa-flask"></i> 水质参数输入</h2>
+                    <p class="step-subtitle">上传水质报告或手动输入进出水水质参数</p>
+                    <!-- 文件上传说明 -->
+                    <div style="background: rgba(56, 189, 248, 0.1); border-left: 4px solid var(--primary); padding: 12px 16px; margin-bottom: 16px; border-radius: 8px;">
+                        <div style="font-size: 13px; color: var(--gray);">
+                            <i class="fas fa-info-circle" style="color: var(--primary);"></i>
+                            <strong>使用提示：</strong>支持直接上传PDF/图片文件，AI将自动解析水质参数。也可以复制水质报告文本粘贴到下方文本框进行解析。
+                        </div>
+                    </div>
+                    
+                    <div class="upload-section">
+                        <div class="upload-card" :class="{ 'has-file': inletReport }" @click="triggerUpload('inlet')">
+                            <input type="file" ref="inletFileInput" @change="handleFileSelect($event, 'inlet')" style="display: none" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.jpeg,.png">
+                            <i class="fas upload-icon" :class="inletReport ? 'fa-file-check' : 'fa-cloud-upload-alt'"></i>
+                            <div class="upload-title">进水水质报告</div>
+                            <div class="upload-desc">{{ inletReport ? inletReport.name : '点击上传PDF/图片自动解析' }}</div>
+                            <div v-if="inletReport" style="margin-top: 8px; font-size: 12px; color: var(--success);">
+                                <i class="fas fa-check-circle"></i> 已上传
+                            </div>
+                            <div v-else style="margin-top: 8px; font-size: 11px; color: var(--gray);">
+                                <i class="fas fa-robot"></i> 支持PDF/图片AI智能识别
+                            </div>
+                        </div>
+                        <div class="upload-card" :class="{ 'has-file': outletReport }" @click="triggerUpload('outlet')">
+                            <input type="file" ref="outletFileInput" @change="handleFileSelect($event, 'outlet')" style="display: none" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.jpeg,.png">
+                            <i class="fas upload-icon" :class="outletReport ? 'fa-file-check' : 'fa-cloud-upload-alt'"></i>
+                            <div class="upload-title">出水水质要求</div>
+                            <div class="upload-desc">{{ outletReport ? outletReport.name : '点击上传标准文件或要求' }}</div>
+                            <div v-if="outletReport" style="margin-top: 8px; font-size: 12px; color: var(--success);">
+                                <i class="fas fa-check-circle"></i> 已上传
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 文本粘贴区域 -->
+                    <div style="margin-bottom: 24px;">
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-paste"></i> 粘贴水质报告文本（可选）</div>
+                            <p style="font-size: 12px; color: var(--gray); margin-bottom: 12px;">
+                                如果文件无法自动识别，请直接复制水质报告中的文本内容粘贴到下方，系统将自动解析参数。
+                            </p>
+                            <textarea 
+                                v-model="pastedReportText" 
+                                class="form-input" 
+                                rows="4" 
+                                placeholder="请粘贴水质报告内容，例如：&#10;pH: 7.5&#10;浊度: 2.5 NTU&#10;COD: 45 mg/L&#10;TDS: 350 mg/L&#10;..."
+                                style="font-family: monospace; resize: vertical;">
+                            </textarea>
+                            <div style="margin-top: 12px; text-align: center;">
+                                <button class="btn btn-success" @click="analyzePastedText" :disabled="analyzing || !pastedReportText">
+                                    <i class="fas" :class="analyzing ? 'fa-spinner fa-spin' : 'fa-magic'"></i>
+                                    {{ analyzing ? '智能解析中...' : '智能解析粘贴的文本' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- AI智能解析按钮区域 -->
+                    <div v-if="inletReport || outletReport" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(168, 85, 247, 0.1)); border: 2px dashed var(--primary); border-radius: 16px; padding: 24px; margin-bottom: 24px; text-align: center;">
+                        <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--light);">
+                            <i class="fas fa-robot" style="color: var(--primary);"></i> 已准备好解析水质报告
+                        </div>
+                        <p style="font-size: 13px; color: var(--gray); margin-bottom: 16px;">
+                            检测到已上传 {{ inletReport ? '进水报告' : '' }} {{ inletReport && outletReport ? '和' : '' }} {{ outletReport ? '出水要求' : '' }}
+                        </p>
+                        <button class="btn btn-success" @click="analyzeReportsWithGemini" :disabled="analyzing" style="font-size: 16px; padding: 14px 32px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);">
+                            <i class="fas" :class="analyzing ? 'fa-spinner fa-spin' : 'fa-magic'"></i>
+                            {{ analyzing ? 'AI智能解析中...' : '点击开始AI智能解析' }}
+                        </button>
+                        <p style="font-size: 12px; color: var(--gray); margin-top: 12px;">
+                            <i class="fas fa-info-circle"></i> 系统将自动识别pH、浊度、COD、TDS等水质参数
+                        </p>
+                    </div>
+                    <div class="tabs">
+                        <button class="tab" :class="{ active: inputTab === 'inlet' }" @click="inputTab = 'inlet'"><i class="fas fa-arrow-down"></i> 进水水质</button>
+                        <button class="tab" :class="{ active: inputTab === 'outlet' }" @click="inputTab = 'outlet'"><i class="fas fa-arrow-up"></i> 出水水质要求</button>
+                    </div>
+                    <div v-show="inputTab === 'inlet'" class="wq-grid">
+                        <!-- 基础理化 -->
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-vial"></i> 基础理化</div>
+                            <div class="form-group"><label class="form-label">pH值</label><input type="number" v-model="waterQuality.inlet.ph" class="form-input" step="0.1"></div>
+                            <div class="form-group"><label class="form-label">浊度</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.turbidity" class="form-input"><span class="input-unit">NTU</span></div></div>
+                            <div class="form-group"><label class="form-label">SDI₁₅ (污染指数)</label><input type="number" v-model="waterQuality.inlet.sdi" class="form-input" step="0.1"></div>
+                            <div class="form-group"><label class="form-label">电导率</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.conductivity" class="form-input"><span class="input-unit">μs/cm</span></div></div>
+                            <div class="form-group"><label class="form-label">总悬浮固体 TSS</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.tss" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">水温</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.temperature" class="form-input"><span class="input-unit">°C</span></div></div>
+                        </div>
+                        <!-- 阳离子 -->
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-plus-circle"></i> 阳离子</div>
+                            <div class="form-group"><label class="form-label">钙 (Ca²⁺)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.calcium" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">镁 (Mg²⁺)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.magnesium" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">钠 (Na⁺)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.sodium" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">钾 (K⁺)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.potassium" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">铁 (Total Fe)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.iron" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">锰 (Mn²⁺)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.manganese" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">钡/锶 (Ba²⁺/Sr²⁺)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.barium_strontium" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                        </div>
+                        <!-- 阴离子 -->
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-minus-circle"></i> 阴离子</div>
+                            <div class="form-group"><label class="form-label">氯离子 (Cl⁻)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.chloride" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">硫酸根 (SO₄²⁻)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.sulfate" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">硝酸根 (NO₃⁻)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.nitrate" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">氟离子 (F⁻)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.fluoride" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">重碳酸根 (HCO₃⁻)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.bicarbonate" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">二氧化硅 (SiO₂)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.silica" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                        </div>
+                        <!-- 有机/生物 -->
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-flask"></i> 有机/生物</div>
+                            <div class="form-group"><label class="form-label">CODcr</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.cod" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">BOD₅</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.bod" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">TOC (总有机碳)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.toc" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">色度</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.color" class="form-input"><span class="input-unit">倍</span></div></div>
+                            <div class="form-group"><label class="form-label">细菌总数</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.bacteria" class="form-input"><span class="input-unit">CFU/mL</span></div></div>
+                        </div>
+                        <!-- 安全性指标 -->
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-shield-alt"></i> 安全性指标</div>
+                            <div class="form-group"><label class="form-label">余氯 (Free Cl₂)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.chlorine" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">ORP (氧化还原电位)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.orp" class="form-input"><span class="input-unit">mV</span></div></div>
+                        </div>
+                        <!-- 营养盐 -->
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-atom"></i> 营养盐</div>
+                            <div class="form-group"><label class="form-label">氨氮 (NH₃-N)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.ammonia" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">总氮 (TN)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.tn" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">总磷 (TP)</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.tp" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                        </div>
+                        <!-- 其他 -->
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-gem"></i> 其他</div>
+                            <div class="form-group"><label class="form-label">悬浮物 SS</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.ss" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">TDS</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.tds" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">总硬度</label><div class="input-with-unit"><input type="number" v-model="waterQuality.inlet.hardness" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                        </div>
+                    </div>
+                    <div v-show="inputTab === 'outlet'" class="wq-grid">
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-bullseye"></i> 出水标准</div>
+                            <div class="form-group">
+                                <label class="form-label">选择标准</label>
+                                <select v-model="waterQuality.outlet.standard" class="form-input" @change="applyStandard">
+                                    <option value="custom">自定义</option>
+                                    <option value="gb5749">GB 5749 饮用水</option>
+                                    <option value="gb18918_1a">GB 18918 一级A</option>
+                                    <option value="ro_feed">RO进水要求</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-vial"></i> 基本参数</div>
+                            <div class="form-group"><label class="form-label">pH值</label><input type="number" v-model="waterQuality.outlet.ph" class="form-input" step="0.1"></div>
+                            <div class="form-group"><label class="form-label">浊度</label><div class="input-with-unit"><input type="number" v-model="waterQuality.outlet.turbidity" class="form-input"><span class="input-unit">NTU</span></div></div>
+                        </div>
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-flask"></i> 有机物</div>
+                            <div class="form-group"><label class="form-label">COD</label><div class="input-with-unit"><input type="number" v-model="waterQuality.outlet.cod" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">BOD₅</label><div class="input-with-unit"><input type="number" v-model="waterQuality.outlet.bod" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                        </div>
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-atom"></i> 营养盐</div>
+                            <div class="form-group"><label class="form-label">氨氮</label><div class="input-with-unit"><input type="number" v-model="waterQuality.outlet.ammonia" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">总氮</label><div class="input-with-unit"><input type="number" v-model="waterQuality.outlet.tn" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                            <div class="form-group"><label class="form-label">总磷</label><div class="input-with-unit"><input type="number" v-model="waterQuality.outlet.tp" class="form-input"><span class="input-unit">mg/L</span></div></div>
+                        </div>
+                    </div>
+                    <!-- AI解析结果预览和校正面板 -->
+                    <div v-if="aiParsePreview.show" class="ai-result" style="margin-bottom: 24px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 10px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-robot"></i></div>
+                            <div>
+                                <div style="font-size: 18px; font-weight: 600;">AI 智能解析结果</div>
+                                <div style="font-size: 12px; color: #94a3b8;">
+                                    置信度: {{ aiParsePreview.confidence }}% | 识别 {{ Object.keys(aiParsePreview.data).filter(k => !['missing_params','analysis'].includes(k)).length }} 个参数
+                                    <span v-if="aiParsePreview.source === 'ai'" style="color: var(--success); margin-left: 8px;"><i class="fas fa-brain"></i> 硅基流动AI解析</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 解析失败提示 -->
+                        <div v-if="aiParsePreview.data && aiParsePreview.data.parse_error" style="background: rgba(239, 68, 68, 0.1); border: 2px dashed #ef4444; border-radius: 12px; padding: 20px; margin-bottom: 16px; text-align: center;">
+                            <div style="font-size: 48px; margin-bottom: 12px;">⚠️</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #ef4444; margin-bottom: 12px;">
+                                <i class="fas fa-exclamation-circle"></i> AI解析失败
+                            </div>
+                            <div style="font-size: 14px; color: #cbd5e1; line-height: 1.8; margin-bottom: 16px;">
+                                无法识别图片中的水质参数，可能原因：
+                                <ul style="text-align: left; display: inline-block; margin-top: 8px;">
+                                    <li>图片清晰度不足，文字无法辨认</li>
+                                    <li>图片中的文字是手写体或特殊字体</li>
+                                    <li>图片格式不支持或文件损坏</li>
+                                    <li>AI服务暂时不可用</li>
+                                </ul>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 16px; text-align: left;">
+                                <div style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;"><i class="fas fa-lightbulb"></i> 建议解决方案：</div>
+                                <div style="font-size: 13px; color: #e2e8f0; line-height: 1.6;">
+                                    1. 尝试截取更清晰的图片上传<br>
+                                    2. 或直接复制水质报告中的文本内容<br>
+                                    3. 粘贴到下方的"粘贴水质报告文本"区域进行解析
+                                </div>
+                            </div>
+                            <button class="btn" @click="scrollToTextPaste" style="background: var(--primary); color: white;">
+                                <i class="fas fa-paste"></i> 切换到文本粘贴解析
+                            </button>
+                        </div>
+                        
+                        <!-- 未识别到参数提示 -->
+                        <div v-else-if="aiParsePreview.data && aiParsePreview.data.no_params" style="background: rgba(251, 191, 36, 0.1); border: 2px dashed #fbbf24; border-radius: 12px; padding: 20px; margin-bottom: 16px; text-align: center;">
+                            <div style="font-size: 48px; margin-bottom: 12px;">🔍</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #fbbf24; margin-bottom: 12px;">
+                                <i class="fas fa-search"></i> 未识别到水质参数
+                            </div>
+                            <div style="font-size: 14px; color: #cbd5e1; line-height: 1.8; margin-bottom: 16px;">
+                                报告中未能识别出任何水质参数
+                            </div>
+                            <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px; margin-bottom: 16px; text-align: left;">
+                                <div style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;"><i class="fas fa-info-circle"></i> 支持的格式示例：</div>
+                                <div style="font-size: 13px; color: #e2e8f0; line-height: 1.6; font-family: monospace;">
+                                    pH: 7.5<br>
+                                    浊度: 2.5 NTU<br>
+                                    COD: 45 mg/L<br>
+                                    TDS: 350 mg/L
+                                </div>
+                            </div>
+                            <button class="btn" @click="scrollToTextPaste" style="background: var(--primary); color: white;">
+                                <i class="fas fa-paste"></i> 手动粘贴文本解析
+                            </button>
+                        </div>
+                        
+                        <!-- AI分析摘要 -->
+                        <div v-else-if="aiParsePreview.analysis" style="background: rgba(56, 189, 248, 0.1); border-left: 4px solid var(--primary); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
+                            <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;"><i class="fas fa-chart-bar"></i> AI分析摘要</div>
+                            <div style="font-size: 12px; color: #cbd5e1; line-height: 1.6;">{{ aiParsePreview.analysis }}</div>
+                        </div>
+                        
+                        <!-- 缺失参数提示 -->
+                        <div v-if="aiParsePreview.missingParams && aiParsePreview.missingParams.length > 0" style="background: rgba(251, 191, 36, 0.1); border-left: 4px solid #fbbf24; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
+                            <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #fbbf24;"><i class="fas fa-exclamation-triangle"></i> 需要补充的参数 ({{ aiParsePreview.missingParams.length }}项)</div>
+                            <div style="font-size: 12px; color: #cbd5e1; line-height: 1.6;">
+                                报告中未检测到以下参数，建议手动补充或AI模拟估算：
+                                <span style="color: #fbbf24;">{{ aiParsePreview.missingParams.join('、') }}</span>
+                            </div>
+                            <div style="margin-top: 8px;">
+                                <button class="btn" @click="simulateMissingParams" style="background: rgba(251, 191, 36, 0.2); color: #fbbf24; font-size: 12px; padding: 6px 12px;">
+                                    <i class="fas fa-magic"></i> AI模拟估算缺失参数
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 解析预览表格 -->
+                        <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;"><i class="fas fa-table"></i> 识别到的参数</div>
+                            <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                                        <th style="text-align: left; padding: 8px;">参数名</th>
+                                        <th style="text-align: left; padding: 8px;">识别值</th>
+                                        <th style="text-align: left; padding: 8px;">单位</th>
+                                        <th style="text-align: left; padding: 8px;">置信度</th>
+                                        <th style="text-align: center; padding: 8px;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(item, key) in aiParsePreview.data" :key="key" v-if="!['missing_params','analysis','parse_error','raw_content'].includes(key)" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                        <td style="padding: 8px;">{{ getParamLabel(key) }}</td>
+                                        <td style="padding: 8px;">
+                                            <input type="number" v-model="aiParsePreview.data[key].value" 
+                                                style="width: 80px; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; font-size: 13px;">
+                                        </td>
+                                        <td style="padding: 8px; color: #94a3b8;">{{ aiParsePreview.data[key].unit }}</td>
+                                        <td style="padding: 8px;">
+                                            <span :style="{ color: getConfidenceColor(aiParsePreview.data[key].confidence) }">
+                                                {{ aiParsePreview.data[key].confidence }}%
+                                            </span>
+                                        </td>
+                                        <td style="padding: 8px; text-align: center;">
+                                            <button @click="removeParsedParam(key)" style="background: none; border: none; color: #ef4444; cursor: pointer;">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- 操作按钮 -->
+                        <div v-if="!aiParsePreview.data || (!aiParsePreview.data.parse_error && !aiParsePreview.data.no_params)" style="display: flex; gap: 12px; justify-content: center;">
+                            <button class="btn" @click="applyParsedData" style="background: var(--success); color: white;">
+                                <i class="fas fa-check"></i> 应用解析结果
+                            </button>
+                            <button class="btn" @click="cancelParsePreview" style="background: rgba(255,255,255,0.2); color: white;">
+                                <i class="fas fa-times"></i> 取消
+                            </button>
+                        </div>
+                        <div v-else style="display: flex; gap: 12px; justify-content: center;">
+                            <button class="btn" @click="cancelParsePreview" style="background: rgba(255,255,255,0.2); color: white;">
+                                <i class="fas fa-times"></i> 关闭
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div v-if="aiAnalysisResult" class="ai-result">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 10px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-robot"></i></div>
+                            <div style="font-size: 18px; font-weight: 600;">AI 水质分析报告</div>
+                        </div>
+                        <div style="line-height: 1.8; font-size: 14px;" v-html="aiAnalysisResult"></div>
+                    </div>
+                    <div class="btn-group"><button class="btn btn-primary" @click="nextStep">下一步 <i class="fas fa-arrow-right"></i></button></div>
+                </div>
+                
+                <!-- Step 2: Flow & Membrane -->
+                <div v-if="currentStep === 1" class="step-content">
+                    <h2 class="step-title"><i class="fas fa-tint"></i> 水量与膜组件选型</h2>
+                    <p class="step-subtitle">输入设计水量并选择膜组件，支持自定义工艺流程配置</p>
+                    
+                    <!-- 工艺流程配置 -->
+                    <div class="wq-card" style="margin-bottom: 24px;">
+                        <div class="wq-card-title"><i class="fas fa-project-diagram"></i> 工艺流程配置</div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                            <div class="form-group">
+                                <label class="form-label">预处理工艺</label>
+                                <select v-model="processConfig.pretreatment" class="form-input">
+                                    <option value="none">无预处理</option>
+                                    <option value="multimedia">多介质过滤</option>
+                                    <option value="activated_carbon">活性炭过滤</option>
+                                    <option value="multimedia+carbon">多介质+活性炭</option>
+                                    <option value="softening">软化处理</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">精密过滤</label>
+                                <select v-model="processConfig.precisionFilter" class="form-input">
+                                    <option value="none">无</option>
+                                    <option value="50um">50μm 袋式过滤</option>
+                                    <option value="10um">10μm 滤芯</option>
+                                    <option value="5um">5μm 保安过滤</option>
+                                    <option value="1um">1μm 精密过滤</option>
+                                    <option value="0.45um">0.45μm 微滤</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">超滤系统</label>
+                                <select v-model="processConfig.ufSystem" class="form-input">
+                                    <option value="none">无超滤</option>
+                                    <option value="uf_pvdf">超滤 (PVDF)</option>
+                                    <option value="uf_pes">超滤 (PES)</option>
+                                    <option value="uf_ps">超滤 (PS)</option>
+                                    <option value="uf_pan">超滤 (PAN)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">主处理工艺</label>
+                                <select v-model="processConfig.mainProcess" class="form-input">
+                                    <option value="ro">反渗透 RO</option>
+                                    <option value="nf">纳滤 NF</option>
+                                    <option value="uf_only">仅超滤</option>
+                                    <option value="ro+edi">RO + EDI</option>
+                                    <option value="ro+mixed">RO + 混床</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 12px; background: var(--primary-light); border-radius: 8px; font-size: 13px;">
+                            <i class="fas fa-info-circle"></i> 当前工艺流程: <strong>{{ processFlowDescription }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="wq-grid">
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-chart-line"></i> 设计水量</div>
+                            <div class="form-group"><label class="form-label">进水量 (Qf)</label><div class="input-with-unit"><input type="number" v-model="designFlow.feed" class="form-input"><span class="input-unit">m³/h</span></div></div>
+                            <div class="form-group"><label class="form-label">期望产水量 (Qp)</label><div class="input-with-unit"><input type="number" v-model="designFlow.permeate" class="form-input"><span class="input-unit">m³/h</span></div></div>
+                            <div class="form-group"><label class="form-label">设计回收率</label><div class="input-with-unit"><input type="number" v-model="designFlow.recovery" class="form-input" step="0.1"><span class="input-unit">%</span></div></div>
+                        </div>
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-calculator"></i> 计算结果</div>
+                            <div class="summary-item"><span>浓水量</span><span><strong>{{ calculated.concentrate }} m³/h</strong></span></div>
+                            <div class="summary-item"><span>实际回收率</span><span><strong>{{ calculated.actualRecovery }}%</strong></span></div>
+                            <div class="summary-item"><span>浓缩倍数 (CF)</span><span><strong>{{ calculated.cf }}</strong></span></div>
+                        </div>
+                    </div>
+
+                    <!-- 超滤膜选择 -->
+                    <div v-if="processConfig.ufSystem !== 'none'" style="margin: 24px 0;">
+                        <h3 style="margin-bottom: 16px; font-size: 18px;"><i class="fas fa-filter"></i> 超滤膜组件选择</h3>
+                        <div class="membrane-grid">
+                            <div v-for="uf in filteredUFMembranes" :key="uf.model" class="membrane-card" :class="{ selected: selectedUFMembrane === uf.model }" @click="selectUFMembrane(uf)">
+                                <div class="membrane-brand">{{ uf.brand }}</div>
+                                <div class="membrane-model">{{ uf.model }}</div>
+                                <div class="membrane-specs">
+                                    <div><strong>材质:</strong> {{ uf.material }}</div>
+                                    <div><strong>膜面积:</strong> {{ uf.area }} m²</div>
+                                    <div><strong>截留分子量:</strong> {{ uf.mwco }} kDa</div>
+                                    <div><strong>通量:</strong> {{ uf.flux }} LMH</div>
+                                </div>
+                                <div v-if="uf.description" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 12px; color: var(--gray);">
+                                    {{ uf.description }}
+                                </div>
+                                <div v-if="uf.maxPressure" style="margin-top: 4px; font-size: 11px; color: var(--primary);">
+                                    <i class="fas fa-info-circle"></i> 最高压力: {{ uf.maxPressure }} bar | pH: {{ uf.phRange }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 纳滤膜选择 -->
+                    <div v-if="processConfig.mainProcess === 'nf'" style="margin: 24px 0;">
+                        <h3 style="margin-bottom: 16px; font-size: 18px;"><i class="fas fa-filter"></i> 纳滤膜组件选择</h3>
+                        <div class="membrane-grid">
+                            <div v-for="nf in nfMembranes" :key="nf.model" class="membrane-card" :class="{ selected: selectedNFMembrane === nf.model }" @click="selectNFMembrane(nf)">
+                                <div class="membrane-brand">{{ nf.brand }}</div>
+                                <div class="membrane-model">{{ nf.model }}</div>
+                                <div class="membrane-specs">
+                                    <div><strong>产水量:</strong> {{ nf.flow }} GPD</div>
+                                    <div><strong>脱盐率:</strong> {{ nf.rejection }}%</div>
+                                    <div><strong>膜面积:</strong> {{ nf.area }} ft²</div>
+                                    <div><strong>操作压力:</strong> {{ nf.pressure }} psi</div>
+                                </div>
+                                <div v-if="nf.description" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 12px; color: var(--gray);">
+                                    {{ nf.description }}
+                                </div>
+                                <div v-if="nf.typicalApplications" style="margin-top: 4px; font-size: 11px; color: var(--success);">
+                                    <i class="fas fa-check-circle"></i> 应用: {{ nf.typicalApplications }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RO膜选择 -->
+                    <div v-if="processConfig.mainProcess.includes('ro')" style="margin: 24px 0;">
+                        <h3 style="margin-bottom: 16px; font-size: 18px;"><i class="fas fa-tint"></i> RO反渗透膜组件选择</h3>
+                        <div class="tabs" style="margin-bottom: 16px;">
+                            <button class="tab" :class="{ active: membraneFilter === 'all' }" @click="membraneFilter = 'all'">全部</button>
+                            <button class="tab" :class="{ active: membraneFilter === 'bw' }" @click="membraneFilter = 'bw'">苦咸水 BW</button>
+                            <button class="tab" :class="{ active: membraneFilter === 'sw' }" @click="membraneFilter = 'sw'">海水淡化 SW</button>
+                            <button class="tab" :class="{ active: membraneFilter === 'le' }" @click="membraneFilter = 'le'">低能耗 LE</button>
+                        </div>
+                        <div class="membrane-grid">
+                            <div v-for="mem in filteredMembranes" :key="mem.model" class="membrane-card" :class="{ selected: selectedMembrane === mem.model }" @click="selectMembrane(mem)">
+                                <div class="membrane-brand">{{ mem.brand }}</div>
+                                <div class="membrane-model">{{ mem.model }}</div>
+                                <div class="membrane-specs">
+                                    <div><strong>产水量:</strong> {{ mem.flow }} GPD</div>
+                                    <div><strong>脱盐率:</strong> {{ mem.rejection }}%</div>
+                                    <div><strong>膜面积:</strong> {{ mem.area }} ft²</div>
+                                    <div><strong>操作压力:</strong> {{ mem.pressure }} psi</div>
+                                </div>
+                                <div v-if="mem.description" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 12px; color: var(--gray);">
+                                    {{ mem.description }}
+                                </div>
+                                <div v-if="mem.phRange" style="margin-top: 4px; font-size: 11px; color: var(--primary);">
+                                    <i class="fas fa-info-circle"></i> pH: {{ mem.phRange }} | 最高温度: {{ mem.maxTemp }}°C
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" @click="prevStep"><i class="fas fa-arrow-left"></i> 上一步</button>
+                        <button class="btn btn-primary" @click="nextStep">下一步 <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+                
+                <!-- Step 3: AI Analysis -->
+                <div v-if="currentStep === 2" class="step-content">
+                    <h2 class="step-title"><i class="fas fa-brain"></i> AI 运行分析</h2>
+                    <p class="step-subtitle">基于水质数据和膜选型，AI分析系统运行情况</p>
+                    <div style="text-align: center; padding: 40px;">
+                        <button class="btn btn-success" @click="runAIAnalysis" :disabled="aiRunning" style="font-size: 16px; padding: 16px 32px;">
+                            <i class="fas" :class="aiRunning ? 'fa-spinner fa-spin' : 'fa-brain'"></i>
+                            {{ aiRunning ? 'AI分析中...' : '开始AI运行分析' }}
+                        </button>
+                    </div>
+                    <div v-if="aiAnalysis" class="ai-result">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 10px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-robot"></i></div>
+                            <div style="font-size: 18px; font-weight: 600;">AI 运行分析报告</div>
+                        </div>
+                        <div style="line-height: 1.8; font-size: 14px;" v-html="aiAnalysis"></div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" @click="prevStep"><i class="fas fa-arrow-left"></i> 上一步</button>
+                        <button class="btn btn-primary" @click="nextStep" :disabled="!aiAnalysis">下一步 <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+                
+                <!-- Step 4: Equipment Config -->
+                <div v-if="currentStep === 3" class="step-content">
+                    <h2 class="step-title"><i class="fas fa-cogs"></i> 设备配置</h2>
+                    <p class="step-subtitle">配置膜系统段式、膜数量及水泵选型（支持智能推荐）</p>
+                    
+                    <!-- 超滤配置 -->
+                    <div v-if="processConfig.ufSystem !== 'none' && selectedUFMembrane" style="margin-bottom: 24px;">
+                        <div class="wq-card">
+                            <div class="wq-card-title"><i class="fas fa-filter"></i> 超滤系统配置</div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                                <div class="form-group">
+                                    <label class="form-label">超滤膜型号</label>
+                                    <input type="text" v-model="selectedUFMembrane" class="form-input" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">膜组件数量</label>
+                                    <input type="number" v-model="config.ufElements" class="form-input" min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">运行通量 (LMH)</label>
+                                    <input type="number" v-model="config.ufFlux" class="form-input" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RO配置 -->
+                    <div v-if="processConfig.mainProcess.includes('ro')" style="margin-bottom: 24px;">
+                        <div class="wq-grid">
+                            <div class="wq-card">
+                                <div class="wq-card-title"><i class="fas fa-layer-group"></i> RO膜系统配置</div>
+                                <div class="form-group">
+                                    <label class="form-label">段式配置</label>
+                                    <select v-model="config.stages" class="form-input">
+                                        <option :value="1">一段式 (1-stage)</option>
+                                        <option :value="2">两段式 (2-stage)</option>
+                                        <option :value="3">三段式 (3-stage)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label class="form-label">每支压力容器膜数量</label><input type="number" v-model="config.elementsPerVessel" class="form-input" min="1" max="8"></div>
+                                <div class="form-group"><label class="form-label">第一段膜壳数量</label><input type="number" v-model="config.vesselsStage1" class="form-input" min="1"></div>
+                                <div class="form-group" v-if="config.stages >= 2"><label class="form-label">第二段膜壳数量</label><input type="number" v-model="config.vesselsStage2" class="form-input" min="1"></div>
+                                <div class="form-group" v-if="config.stages >= 3"><label class="form-label">第三段膜壳数量</label><input type="number" v-model="config.vesselsStage3" class="form-input" min="1"></div>
+                            </div>
+                            <div class="wq-card">
+                                <div class="wq-card-title"><i class="fas fa-calculator"></i> 配置计算</div>
+                                <div class="summary-item"><span>总膜数量</span><span><strong>{{ totalElements }} 支</strong></span></div>
+                                <div class="summary-item"><span>理论产水量</span><span><strong>{{ theoreticalFlow }} m³/h</strong></span></div>
+                                <div class="summary-item"><span>膜通量</span><span><strong>{{ flux }} LMH</strong></span></div>
+                                <div class="summary-item"><span>膜壳总数</span><span><strong>{{ totalVessels }} 支</strong></span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 水泵选型 -->
+                    <div class="wq-card" style="margin-bottom: 24px;">
+                        <div class="wq-card-title"><i class="fas fa-pump-soap"></i> 水泵选型 (南方泵业 CNP)</div>
+                        <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                            <button class="btn" :class="pumpFilter === 'all' ? 'btn-primary' : 'btn-secondary'" @click="pumpFilter = 'all'">全部系列</button>
+                            <button class="btn" :class="pumpFilter === 'cdl' ? 'btn-primary' : 'btn-secondary'" @click="pumpFilter = 'cdl'">CDL/CDLF</button>
+                            <button class="btn" :class="pumpFilter === 'cdm' ? 'btn-primary' : 'btn-secondary'" @click="pumpFilter = 'cdm'">CDM/CDMF</button>
+                            <button class="btn" :class="pumpFilter === 'chlf' ? 'btn-primary' : 'btn-secondary'" @click="pumpFilter = 'chlf'">CHL/CHLF</button>
+                            <button class="btn" :class="pumpFilter === 'td' ? 'btn-primary' : 'btn-secondary'" @click="pumpFilter = 'td'">TD管道泵</button>
+                            <button class="btn" :class="pumpFilter === 'niso' ? 'btn-primary' : 'btn-secondary'" @click="pumpFilter = 'niso'">NISO端吸泵</button>
+                            <button class="btn" :class="pumpFilter === 'zs' ? 'btn-primary' : 'btn-secondary'" @click="pumpFilter = 'zs'">ZS卧式泵</button>
+                            <button class="btn" :class="pumpFilter === 'qs' ? 'btn-primary' : 'btn-secondary'" @click="pumpFilter = 'qs'">QS潜水泵</button>
+                            <button class="btn" :class="pumpFilter === 'wq' ? 'btn-primary' : 'btn-secondary'" @click="pumpFilter = 'wq'">WQ污水泵</button>
+                        </div>
+                        <div class="pump-list">
+                            <div v-for="pump in filteredPumps" :key="pump.model" class="pump-item" :class="{ selected: selectedPump === pump.model }" @click="selectPump(pump)">
+                                <div class="pump-icon"><i class="fas fa-pump-soap"></i></div>
+                                <div class="pump-info">
+                                    <div style="font-weight: 600; margin-bottom: 4px;">{{ pump.model }}</div>
+                                    <div style="font-size: 13px; color: var(--gray);">
+                                        流量: {{ pump.flow }} m³/h | 扬程: {{ pump.head }} m | 功率: {{ pump.power }} kW | 转速: {{ pump.rpm }} rpm
+                                    </div>
+                                    <div style="font-size: 12px; color: var(--primary); margin-top: 4px;">{{ pump.description }}</div>
+                                </div>
+                                <span v-if="pump.recommended" style="background: var(--warning); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                                    <i class="fas fa-star"></i> 推荐
+                                </span>
+                                <span v-else style="background: var(--success); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">可选</span>
+                            </div>
+                        </div>
+                        <div v-if="!selectedPump" style="margin-top: 16px; padding: 12px; background: var(--primary-light); border-radius: 8px; font-size: 13px;">
+                            <i class="fas fa-lightbulb"></i> <strong>智能推荐：</strong>基于您的设计流量 {{ designFlow.feed }} m³/h，
+                            <span v-if="recommendedPumpModel">推荐使用 <strong>{{ recommendedPumpModel }}</strong></span>
+                            <span v-else>请选择合适的水泵</span>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" @click="prevStep"><i class="fas fa-arrow-left"></i> 上一步</button>
+                        <button class="btn btn-primary" @click="nextStep">下一步 <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+                
+                <!-- Step 5: Flow Diagram -->
+                <div v-if="currentStep === 4" class="step-content">
+                    <h2 class="step-title"><i class="fas fa-project-diagram"></i> 工艺流程图</h2>
+                    <p class="step-subtitle">根据您的配置自动生成的完整工艺流程图</p>
+                    
+                    <div class="flow-diagram">
+                        <div class="flow-container">
+                            <!-- 原水 -->
+                            <div class="flow-node"><i class="fas fa-water" style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></i><div style="font-weight: 600;">原水箱</div></div>
+                            <i class="fas fa-arrow-right" style="color: var(--gray);"></i>
+                            
+                            <!-- 原水泵 -->
+                            <div class="flow-node" v-if="selectedPump"><i class="fas fa-pump-soap" style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></i><div style="font-weight: 600;">原水泵</div><div style="font-size: 11px; color: var(--gray);">{{ selectedPump }}</div></div>
+                            <i class="fas fa-arrow-right" style="color: var(--gray);" v-if="selectedPump"></i>
+                            
+                            <!-- 预处理 -->
+                            <template v-if="processConfig.pretreatment !== 'none'">
+                                <div class="flow-node" v-if="processConfig.pretreatment.includes('multimedia')"><i class="fas fa-filter" style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></i><div style="font-weight: 600;">多介质过滤</div></div>
+                                <i class="fas fa-arrow-right" style="color: var(--gray);" v-if="processConfig.pretreatment.includes('multimedia')"></i>
+                                
+                                <div class="flow-node" v-if="processConfig.pretreatment.includes('carbon')"><i class="fas fa-apple-alt" style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></i><div style="font-weight: 600;">活性炭过滤</div></div>
+                                <i class="fas fa-arrow-right" style="color: var(--gray);" v-if="processConfig.pretreatment.includes('carbon')"></i>
+                                
+                                <div class="flow-node" v-if="processConfig.pretreatment === 'softening'"><i class="fas fa-shield-alt" style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></i><div style="font-weight: 600;">软化器</div></div>
+                                <i class="fas fa-arrow-right" style="color: var(--gray);" v-if="processConfig.pretreatment === 'softening'"></i>
+                            </template>
+                            
+                            <!-- 精密过滤 -->
+                            <div class="flow-node" v-if="processConfig.precisionFilter !== 'none'"><i class="fas fa-filter" style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></i><div style="font-weight: 600;">{{ precisionFilterName }}</div></div>
+                            <i class="fas fa-arrow-right" style="color: var(--gray);" v-if="processConfig.precisionFilter !== 'none'"></i>
+                            
+                            <!-- 超滤 -->
+                            <div class="flow-node primary" v-if="processConfig.ufSystem !== 'none'"><i class="fas fa-filter" style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></i><div style="font-weight: 600;">超滤 UF</div><div style="font-size: 11px; color: var(--gray);">{{ selectedUFMembrane || '未选择' }}</div></div>
+                            <i class="fas fa-arrow-right" style="color: var(--gray);" v-if="processConfig.ufSystem !== 'none'"></i>
+                            
+                            <!-- 超滤产水泵 -->
+                            <div class="flow-node" v-if="processConfig.ufSystem !== 'none'"><i class="fas fa-pump-soap" style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></i><div style="font-weight: 600;">UF产水泵</div></div>
+                            <i class="fas fa-arrow-right" style="color: var(--gray);" v-if="processConfig.ufSystem !== 'none'"></i>
+                            
+                            <!-- RO保安过滤 -->
+                            <div class="flow-node" v-if="processConfig.mainProcess.includes('ro')"><i class="fas fa-shield-alt" style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></i><div style="font-weight: 600;">5μm 保安过滤</div></div>
+                            <i class="fas fa-arrow-right" style="color: var(--gray);" v-if="processConfig.mainProcess.includes('ro')"></i>
+                            
+                            <!-- RO高压泵 -->
+                            <div class="flow-node primary" v-if="processConfig.mainProcess.includes('ro')"><i class="fas fa-sync" style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></i><div style="font-weight: 600;">RO高压泵</div></div>
+                            <i class="fas fa-arrow-right" style="color: var(--gray);" v-if="processConfig.mainProcess.includes('ro')"></i>
+                            
+                            <!-- RO膜组 -->
+                            <div class="flow-node primary" v-if="processConfig.mainProcess.includes('ro')"><i class="fas fa-tint" style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></i><div style="font-weight: 600;">RO膜组</div><div style="font-size: 11px; color: var(--gray);">{{ config.stages }}段 {{ totalElements }}支</div></div>
+                            <i class="fas fa-arrow-right" style="color: var(--gray);" v-if="processConfig.mainProcess.includes('ro')"></i>
+                            
+                            <!-- EDI/混床 -->
+                            <div class="flow-node" v-if="processConfig.mainProcess === 'ro+edi'"><i class="fas fa-bolt" style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></i><div style="font-weight: 600;">EDI电除盐</div></div>
+                            <div class="flow-node" v-if="processConfig.mainProcess === 'ro+mixed'"><i class="fas fa-flask" style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></i><div style="font-weight: 600;">混床离子交换</div></div>
+                            <i class="fas fa-arrow-right" style="color: var(--gray);" v-if="processConfig.mainProcess.includes('edi') || processConfig.mainProcess.includes('mixed')"></i>
+                            
+                            <!-- 产水 -->
+                            <div class="flow-node" style="background: var(--success); color: white;"><i class="fas fa-check-circle" style="font-size: 28px; margin-bottom: 8px;"></i><div style="font-weight: 600;">产水箱</div></div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-grid" style="margin-top: 24px;">
+                        <div class="summary-card">
+                            <div class="wq-card-title"><i class="fas fa-list"></i> 设备清单</div>
+                            <div class="summary-item" v-if="selectedPump"><span>原水泵</span><span><strong>{{ selectedPump }}</strong></span></div>
+                            <div class="summary-item" v-if="processConfig.ufSystem !== 'none'"><span>超滤膜</span><span><strong>{{ selectedUFMembrane }} × {{ config.ufElements }} 支</strong></span></div>
+                            <div class="summary-item" v-if="processConfig.mainProcess.includes('ro')"><span>RO膜组件</span><span><strong>{{ selectedMembrane }} × {{ totalElements }} 支</strong></span></div>
+                            <div class="summary-item" v-if="processConfig.mainProcess.includes('ro')"><span>RO膜壳</span><span><strong>{{ totalVessels }} 支 ({{ config.stages }}段)</strong></span></div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="wq-card-title"><i class="fas fa-chart-bar"></i> 运行参数</div>
+                            <div class="summary-item"><span>进水量</span><span><strong>{{ designFlow.feed }} m³/h</strong></span></div>
+                            <div class="summary-item"><span>产水量</span><span><strong>{{ designFlow.permeate }} m³/h</strong></span></div>
+                            <div class="summary-item"><span>回收率</span><span><strong>{{ designFlow.recovery }}%</strong></span></div>
+                            <div class="summary-item" v-if="flux"><span>膜通量</span><span><strong>{{ flux }} LMH</strong></span></div>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" @click="prevStep"><i class="fas fa-arrow-left"></i> 上一步</button>
+                        <button class="btn btn-primary" @click="nextStep">完成设计 <i class="fas fa-check"></i></button>
+                    </div>
+                </div>
+                
+                <!-- Step 6: Summary -->
+                <div v-if="currentStep === 5" class="step-content">
+                    <h2 class="step-title"><i class="fas fa-clipboard-check"></i> 设计总结</h2>
+                    <p class="step-subtitle">完整的RO水处理系统设计方案</p>
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <div class="wq-card-title"><i class="fas fa-flask"></i> 进水水质</div>
+                            <div class="summary-item"><span>pH</span><span><strong>{{ waterQuality.inlet.ph || '-' }}</strong></span></div>
+                            <div class="summary-item"><span>TDS</span><span><strong>{{ waterQuality.inlet.tds || '-' }} mg/L</strong></span></div>
+                            <div class="summary-item"><span>COD</span><span><strong>{{ waterQuality.inlet.cod || '-' }} mg/L</strong></span></div>
+                            <div class="summary-item"><span>浊度</span><span><strong>{{ waterQuality.inlet.turbidity || '-' }} NTU</strong></span></div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="wq-card-title"><i class="fas fa-bullseye"></i> 出水水质要求</div>
+                            <div class="summary-item"><span>pH</span><span><strong>{{ waterQuality.outlet.ph || '-' }}</strong></span></div>
+                            <div class="summary-item"><span>TDS</span><span><strong>{{ waterQuality.outlet.tds || '-' }} mg/L</strong></span></div>
+                            <div class="summary-item"><span>COD</span><span><strong>{{ waterQuality.outlet.cod || '-' }} mg/L</strong></span></div>
+                            <div class="summary-item"><span>浊度</span><span><strong>{{ waterQuality.outlet.turbidity || '-' }} NTU</strong></span></div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="wq-card-title"><i class="fas fa-filter"></i> 膜系统配置</div>
+                            <div class="summary-item"><span>膜型号</span><span><strong>{{ selectedMembrane || '-' }}</strong></span></div>
+                            <div class="summary-item"><span>段式</span><span><strong>{{ config.stages }} 段</strong></span></div>
+                            <div class="summary-item"><span>膜数量</span><span><strong>{{ totalElements }} 支</strong></span></div>
+                            <div class="summary-item"><span>膜壳数量</span><span><strong>{{ totalVessels }} 支</strong></span></div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="wq-card-title"><i class="fas fa-chart-line"></i> 设计参数</div>
+                            <div class="summary-item"><span>进水量</span><span><strong>{{ designFlow.feed }} m³/h</strong></span></div>
+                            <div class="summary-item"><span>产水量</span><span><strong>{{ designFlow.permeate }} m³/h</strong></span></div>
+                            <div class="summary-item"><span>回收率</span><span><strong>{{ designFlow.recovery }}%</strong></span></div>
+                            <div class="summary-item"><span>膜通量</span><span><strong>{{ flux }} LMH</strong></span></div>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" @click="prevStep"><i class="fas fa-arrow-left"></i> 返回修改</button>
+                        <button class="btn btn-primary" @click="exportDesign"><i class="fas fa-download"></i> 导出设计报告</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    currentStep: 0,
+                    steps: [{ label: '水质参数' }, { label: '水量与膜选型' }, { label: 'AI运行分析' }, { label: '设备配置' }, { label: '工艺流程' }, { label: '设计总结' }],
+                    inputTab: 'inlet',
+                    inletReport: null, outletReport: null,
+                    pastedReportText: '',
+                    analyzing: false, aiRunning: false,
+                    aiAnalysisResult: '', aiAnalysis: '',
+                    // AI解析预览数据
+                    aiParsePreview: {
+                        show: false,
+                        data: {},
+                        confidence: 0,
+                        source: '', // 'text' 或 'file' 或 'ai'
+                        missingParams: [], // 缺失的参数列表
+                        analysis: '' // AI分析摘要
+                    },
+                    waterQuality: {
+                        inlet: { 
+                            // 基础理化
+                            ph: '', turbidity: '', sdi: '', conductivity: '', tss: '', temperature: 25,
+                            // 阳离子
+                            calcium: '', magnesium: '', sodium: '', potassium: '', iron: '', manganese: '', barium_strontium: '',
+                            // 阴离子
+                            chloride: '', sulfate: '', nitrate: '', fluoride: '', bicarbonate: '', silica: '',
+                            // 有机/生物
+                            cod: '', bod: '', toc: '', color: '', bacteria: '',
+                            // 安全性指标
+                            chlorine: '', orp: '',
+                            // 营养盐
+                            ammonia: '', tn: '', tp: '',
+                            // 其他
+                            ss: '', tds: '', hardness: ''
+                        },
+                        outlet: { standard: 'custom', ph: '', turbidity: '', cod: '', bod: '', ammonia: '', tn: '', tp: '', ss: '', tds: '' }
+                    },
+                    designFlow: { feed: 50, permeate: 35, recovery: 70 },
+                    selectedMembrane: '', selectedPump: '', selectedUFMembrane: '', selectedNFMembrane: '',
+                    membraneFilter: 'all', pumpFilter: 'all',
+                    processConfig: {
+                        pretreatment: 'multimedia+carbon',
+                        precisionFilter: '5um',
+                        ufSystem: 'none',
+                        mainProcess: 'ro'
+                    },
+                    config: { stages: 2, elementsPerVessel: 6, vesselsStage1: 4, vesselsStage2: 2, vesselsStage3: 1, ufElements: 4, ufFlux: 50 },
+                    
+                    // 膜运行参数和清洗指导 - 基于技术手册
+                    membraneGuidelines: {
+                        ro: {
+                            operatingParams: {
+                                pressure: { bw: '10-25 bar', sw: '55-83 bar', le: '5-15 bar' },
+                                temperature: { min: 5, max: 45, optimal: 25 },
+                                ph: { operating: '2-11', cleaning: '1-13', optimal: '7-8' },
+                                sdi: { max: 5, optimal: '<3' },
+                                turbidity: { max: 1, unit: 'NTU' },
+                                chlorine: { max: 0.1, unit: 'mg/L', note: '持续暴露会导致膜氧化' },
+                                iron: { max: 0.3, unit: 'mg/L' },
+                                manganese: { max: 0.05, unit: 'mg/L' },
+                                lsi: { max: 0, note: '防止CaCO3结垢' },
+                                sdsi: { max: 0, note: '防止BaSO4/SrSO4/CaSO4结垢' }
+                            },
+                            cleaning: {
+                                frequency: '当标准化产水量下降10-15%或压差增加10-15%时',
+                                methods: [
+                                    { name: '碱性清洗', purpose: '去除有机物、生物污染', 
+                                      solution: 'NaOH (pH 11-12) + Na-DSS或Na-EDTA', 
+                                      temp: '30-35°C', time: '30-60分钟' },
+                                    { name: '酸性清洗', purpose: '去除无机结垢、金属氧化物', 
+                                      solution: 'HCl或柠檬酸 (pH 2-3)', 
+                                      temp: '30-35°C', time: '30-60分钟' },
+                                    { name: '杀菌清洗', purpose: '去除生物污染', 
+                                      solution: 'NaClO (100-500 mg/L) + NaOH (pH 11)', 
+                                      temp: '25-30°C', time: '30分钟', note: '仅限抗污染膜' }
+                                ],
+                                steps: [
+                                    '1. 低压冲洗(3-5 bar)排尽系统内积水',
+                                    '2. 配制清洗液并加热至目标温度',
+                                    '3. 循环清洗液30-60分钟',
+                                    '4. 浸泡(可选)2-12小时',
+                                    '5. 低压冲洗至pH恢复正常',
+                                    '6. 恢复运行并检测产水质量'
+                                ]
+                            },
+                            preservation: {
+                                shortTerm: '每24小时运行或冲洗一次',
+                                longTerm: '1-1.5% NaHSO3溶液保护，每30天更换',
+                                note: '防止微生物滋生和膜干燥'
+                            }
+                        },
+                        uf: {
+                            operatingParams: {
+                                flux: { range: '40-90', unit: 'LMH', typical: 65 },
+                                tmp: { max: 2.1, unit: 'bar', note: '跨膜压差' },
+                                temperature: { min: 1, max: 40, optimal: 25 },
+                                ph: { operating: '2-11', cleaning: '2-12', optimal: '7-8' },
+                                turbidity: { max: 300, unit: 'NTU', feed: true },
+                                tss: { max: 100, unit: 'mg/L' },
+                                particleSize: { max: 300, unit: 'μm' },
+                                chlorine: { max: 2000, unit: 'mg/L', note: 'PVDF膜耐氯性好' },
+                                oil: { max: 0.05, unit: 'mg/L', note: '油脂会导致不可逆污染' }
+                            },
+                            backwash: {
+                                frequency: '每20-60分钟一次',
+                                duration: '30-60秒',
+                                flux: '1.5-2倍产水通量',
+                                pressure: { max: 2.5, unit: 'bar' }
+                            },
+                            airScour: {
+                                frequency: '每1-2次过滤周期一次',
+                                duration: '30-60秒',
+                                flow: { max: 12, unit: 'Nm³/hr' },
+                                pressure: { typical: 1.0, unit: 'bar' }
+                            },
+                            ceb: {
+                                name: '化学加强反洗(CEB)',
+                                frequency: '每天1-2次',
+                                methods: [
+                                    { name: '碱洗CEB', solution: 'NaOH (pH 11-12)', 
+                                      purpose: '去除有机物', duration: '5-10分钟' },
+                                    { name: '酸洗CEB', solution: 'HCl或柠檬酸 (pH 2-3)', 
+                                      purpose: '去除无机结垢', duration: '5-10分钟' },
+                                    { name: '氯洗CEB', solution: 'NaClO (200-500 mg/L)', 
+                                      purpose: '杀菌', duration: '5-10分钟' }
+                                ]
+                            },
+                            cip: {
+                                name: '化学清洗(CIP)',
+                                trigger: '当TMP增加0.5-1 bar或通量下降20%时',
+                                methods: [
+                                    { name: '碱性CIP', solution: 'NaOH (pH 11-12) + 表面活性剂', 
+                                      temp: '25-30°C', time: '30-60分钟' },
+                                    { name: '酸性CIP', solution: 'HCl或柠檬酸 (pH 2-3)', 
+                                      temp: '25-30°C', time: '30-60分钟' }
+                                ]
+                            },
+                            preservation: {
+                                shortTerm: '每24小时运行或反洗一次',
+                                longTerm: '0.5-1.0% NaHSO3溶液保护，每月检查pH',
+                                note: 'pH<3时需更换保护液'
+                            }
+                        },
+                        nf: {
+                            operatingParams: {
+                                pressure: { typical: '5-15', unit: 'bar' },
+                                temperature: { min: 5, max: 45, optimal: 25 },
+                                ph: { operating: '2-11', cleaning: '1-13', optimal: '7-8' },
+                                sdi: { max: 5, optimal: '<3' },
+                                turbidity: { max: 1, unit: 'NTU' },
+                                chlorine: { max: 0.1, unit: 'mg/L', note: '持续暴露会导致膜氧化' }
+                            },
+                            cleaning: {
+                                methods: [
+                                    { name: '碱性清洗', purpose: '去除有机物', 
+                                      solution: 'NaOH (pH 11-12)', temp: '30-35°C' },
+                                    { name: '酸性清洗', purpose: '去除无机结垢', 
+                                      solution: 'HCl或柠檬酸 (pH 2-3)', temp: '30-35°C' }
+                                ]
+                            }
+                        }
+                    },
+                    // 扩展RO膜数据库 - 基于FilmTec 2022技术手册
+                    membranes: [
+                        // ==================== 苦咸水系列 BW ====================
+                        // FilmTec BW30系列 - 标准苦咸水膜
+                        { brand: 'Dow Filmtec', model: 'BW30-400', flow: 10500, rejection: 99.5, area: 400, pressure: 225, category: 'bw', 
+                          description: '标准苦咸水膜，产水量10500GPD，脱盐率99.5%', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'BW30-400/34i', flow: 10500, rejection: 99.5, area: 400, pressure: 225, category: 'bw',
+                          description: '带iLEC端面自锁，降低系统运行成本和O型圈泄漏风险', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'BW30-4040', flow: 2400, rejection: 99.5, area: 85, pressure: 225, category: 'bw',
+                          description: '4英寸膜元件，适合小型系统', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        // FilmTec BW30FR系列 - 抗污染膜
+                        { brand: 'Dow Filmtec', model: 'BW30FR-400/34', flow: 10500, rejection: 99.5, area: 400, pressure: 225, category: 'bw',
+                          description: '抗污染膜，适合废水回用和高SDI进水', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'BW30XFR-400/34', flow: 10500, rejection: 99.5, area: 400, pressure: 225, category: 'bw',
+                          description: '极强抗污染膜，适合高污染水源', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'BW30XFRLE-400/34', flow: 11500, rejection: 99.4, area: 400, pressure: 150, category: 'bw',
+                          description: '低能耗抗污染膜，适合高污染苦咸水', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        // FilmTec BW30HR系列 - 高脱盐率膜
+                        { brand: 'Dow Filmtec', model: 'BW30HR-440', flow: 12700, rejection: 99.7, area: 440, pressure: 225, category: 'bw',
+                          description: '高脱盐率高产水量，440ft²有效膜面积', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'BW30HRLE-440', flow: 12100, rejection: 99.6, area: 440, pressure: 150, category: 'bw',
+                          description: '高脱盐率低能耗，适合高品质产水需求', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'BW30XHR-440/34', flow: 12100, rejection: 99.8, area: 440, pressure: 225, category: 'bw',
+                          description: '极高脱盐率99.8%，适合电子级超纯水', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        // FilmTec BW30PRO系列 - 专业级
+                        { brand: 'Dow Filmtec', model: 'BW30PRO-400/34', flow: 10500, rejection: 99.5, area: 400, pressure: 225, category: 'bw',
+                          description: '专业级苦咸水膜，优化设计', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'BW30PRO-440', flow: 12700, rejection: 99.5, area: 440, pressure: 225, category: 'bw',
+                          description: '专业级440ft²膜面积，高产水量', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        
+                        // ==================== 低能耗系列 LE ====================
+                        { brand: 'Dow Filmtec', model: 'BW30LE-440', flow: 11500, rejection: 99.3, area: 440, pressure: 150, category: 'le',
+                          description: '低能耗苦咸水膜，降低运行成本', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'XLE-440', flow: 12700, rejection: 99.0, area: 440, pressure: 100, category: 'le',
+                          description: '极低能耗，100psi操作压力，适合低盐进水', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'LC LE-4040', flow: 2900, rejection: 99.2, area: 85, pressure: 120, category: 'le',
+                          description: '4英寸低能耗膜', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'TW30-4040', flow: 2400, rejection: 98.5, area: 85, pressure: 225, category: 'le',
+                          description: '自来水级膜，适合低盐进水', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'TW30-4014', flow: 800, rejection: 98.0, area: 28, pressure: 225, category: 'le',
+                          description: '小型4英寸膜，适合家用/商用', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        
+                        // ==================== 海水淡化系列 SW ====================
+                        { brand: 'Dow Filmtec', model: 'SW30HR-380', flow: 6000, rejection: 99.7, area: 380, pressure: 800, category: 'sw',
+                          description: '高脱盐率海水膜，适合高TDS海水', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'SW30XHR-400i', flow: 9000, rejection: 99.8, area: 400, pressure: 800, category: 'sw',
+                          description: '极高脱盐率，适合高品质饮用水', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'SW30XHR-440i', flow: 9900, rejection: 99.8, area: 440, pressure: 800, category: 'sw',
+                          description: '极高脱盐率440ft²，最大产水量', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'SW30ULE-400i', flow: 12000, rejection: 99.6, area: 400, pressure: 600, category: 'sw',
+                          description: '超低能耗海水膜，600psi操作压力', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'SW30ULE-440i', flow: 13200, rejection: 99.6, area: 440, pressure: 600, category: 'sw',
+                          description: '超低能耗440ft²，大产水量', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'SW30-4040', flow: 1950, rejection: 99.4, area: 85, pressure: 800, category: 'sw',
+                          description: '4英寸海水膜', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'SW30-2521', flow: 300, rejection: 99.4, area: 28, pressure: 800, category: 'sw',
+                          description: '2.5英寸小型海水膜', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Dow Filmtec', model: 'SW30-2540', flow: 750, rejection: 99.4, area: 28, pressure: 800, category: 'sw',
+                          description: '2.5英寸海水膜', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        
+                        // ==================== 海德能 Hydranautics ====================
+                        { brand: 'Hydranautics', model: 'CPA3-LD', flow: 11000, rejection: 99.7, area: 400, pressure: 225, category: 'bw',
+                          description: '高脱盐率苦咸水膜', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Hydranautics', model: 'CPA5-LD', flow: 12000, rejection: 99.7, area: 440, pressure: 225, category: 'bw',
+                          description: '高脱盐率440ft²', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Hydranautics', model: 'CPA6-LD', flow: 13200, rejection: 99.7, area: 440, pressure: 150, category: 'bw',
+                          description: '高脱盐率低能耗', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Hydranautics', model: 'ESPA2-LD', flow: 12000, rejection: 99.6, area: 400, pressure: 150, category: 'le',
+                          description: '低能耗高脱盐率', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Hydranautics', model: 'ESPA4-LD', flow: 13200, rejection: 99.2, area: 400, pressure: 100, category: 'le',
+                          description: '极低能耗', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Hydranautics', model: 'SWC5-LD', flow: 9000, rejection: 99.8, area: 400, pressure: 800, category: 'sw',
+                          description: '高脱盐率海水膜', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Hydranautics', model: 'SWC6-LD', flow: 12000, rejection: 99.8, area: 440, pressure: 800, category: 'sw',
+                          description: '高脱盐率高产水量', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        
+                        // ==================== 东丽 Toray ====================
+                        { brand: 'Toray', model: 'TMG20-400', flow: 11000, rejection: 99.5, area: 400, pressure: 150, category: 'le',
+                          description: '超低能耗膜', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Toray', model: 'TMG20D-400', flow: 12100, rejection: 99.5, area: 440, pressure: 150, category: 'le',
+                          description: '超低能耗440ft²', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Toray', model: 'TM720D-400', flow: 10500, rejection: 99.7, area: 400, pressure: 225, category: 'bw',
+                          description: '高脱盐率苦咸水膜', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Toray', model: 'TM720N-400', flow: 11500, rejection: 99.7, area: 440, pressure: 225, category: 'bw',
+                          description: '高脱盐率440ft²', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Toray', model: 'TM820M-400', flow: 7500, rejection: 99.8, area: 400, pressure: 800, category: 'sw',
+                          description: '高脱盐率海水膜', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' },
+                        { brand: 'Toray', model: 'TM820V-400', flow: 9000, rejection: 99.8, area: 400, pressure: 800, category: 'sw',
+                          description: '高脱盐率高产水量', maxTemp: 45, phRange: '2-11', cleaningPh: '1-13' }
+                    ],
+                    // 超滤膜数据库 - 基于DuPont Ultrafiltration 2021技术手册
+                    ufMembranes: [
+                        // ==================== DuPont SFP系列 - 外压式PVDF ====================
+                        { brand: 'DuPont', model: 'SFP-2880', material: 'PVDF', area: 77, mwco: 150, flux: 65, type: 'uf_pvdf',
+                          description: '外压式超滤膜，膜面积77m²，适合大型水处理系统',
+                          length: 2360, diameter: 225, weight: 52, maxTemp: 40, maxPressure: 6.25,
+                          phRange: '2-11', cleaningPh: '2-12', maxChlorine: 2000, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        { brand: 'DuPont', model: 'SFP-2860', material: 'PVDF', area: 51, mwco: 150, flux: 65, type: 'uf_pvdf',
+                          description: '外压式超滤膜，膜面积51m²，中等规模系统',
+                          length: 1860, diameter: 225, weight: 39, maxTemp: 40, maxPressure: 6.25,
+                          phRange: '2-11', cleaningPh: '2-12', maxChlorine: 2000, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        { brand: 'DuPont', model: 'SFP-2660', material: 'PVDF', area: 33, mwco: 150, flux: 65, type: 'uf_pvdf',
+                          description: '外压式超滤膜，膜面积33m²，小型系统',
+                          length: 1860, diameter: 165, weight: 24, maxTemp: 40, maxPressure: 6.25,
+                          phRange: '2-11', cleaningPh: '2-12', maxChlorine: 2000, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        
+                        // ==================== DuPont SFP-XP系列 - 增强型外压式 ====================
+                        { brand: 'DuPont', model: 'SFP-2880XP', material: 'PVDF', area: 77, mwco: 150, flux: 80, type: 'uf_pvdf',
+                          description: '增强型外压式，更高通量80 LMH，适合优质进水',
+                          length: 2360, diameter: 225, weight: 52, maxTemp: 40, maxPressure: 6.25,
+                          phRange: '2-11', cleaningPh: '2-12', maxChlorine: 2000, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        { brand: 'DuPont', model: 'SFP-2860XP', material: 'PVDF', area: 51, mwco: 150, flux: 80, type: 'uf_pvdf',
+                          description: '增强型外压式，更高通量80 LMH',
+                          length: 1860, diameter: 225, weight: 39, maxTemp: 40, maxPressure: 6.25,
+                          phRange: '2-11', cleaningPh: '2-12', maxChlorine: 2000, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        
+                        // ==================== DuPont SFD系列 - 内压式PVDF ====================
+                        { brand: 'DuPont', model: 'SFD-2880', material: 'PVDF', area: 77, mwco: 150, flux: 65, type: 'uf_pvdf',
+                          description: '内压式超滤膜，膜面积77m²，适合高浊度进水',
+                          length: 2360, diameter: 225, weight: 52, maxTemp: 40, maxPressure: 6.25,
+                          phRange: '2-11', cleaningPh: '2-12', maxChlorine: 2000, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        { brand: 'DuPont', model: 'SFD-2860', material: 'PVDF', area: 51, mwco: 150, flux: 65, type: 'uf_pvdf',
+                          description: '内压式超滤膜，膜面积51m²',
+                          length: 1860, diameter: 225, weight: 39, maxTemp: 40, maxPressure: 6.25,
+                          phRange: '2-11', cleaningPh: '2-12', maxChlorine: 2000, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        { brand: 'DuPont', model: 'SFD-2660', material: 'PVDF', area: 33, mwco: 150, flux: 65, type: 'uf_pvdf',
+                          description: '内压式超滤膜，膜面积33m²，小型系统',
+                          length: 1860, diameter: 165, weight: 24, maxTemp: 40, maxPressure: 6.25,
+                          phRange: '2-11', cleaningPh: '2-12', maxChlorine: 2000, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        
+                        // ==================== DuPont SFD-XP系列 - 增强型内压式 ====================
+                        { brand: 'DuPont', model: 'SFD-2880XP', material: 'PVDF', area: 77, mwco: 150, flux: 80, type: 'uf_pvdf',
+                          description: '增强型内压式，更高通量80 LMH',
+                          length: 2360, diameter: 225, weight: 52, maxTemp: 40, maxPressure: 6.25,
+                          phRange: '2-11', cleaningPh: '2-12', maxChlorine: 2000, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        { brand: 'DuPont', model: 'SFD-2860XP', material: 'PVDF', area: 51, mwco: 150, flux: 80, type: 'uf_pvdf',
+                          description: '增强型内压式，更高通量80 LMH',
+                          length: 1860, diameter: 225, weight: 39, maxTemp: 40, maxPressure: 6.25,
+                          phRange: '2-11', cleaningPh: '2-12', maxChlorine: 2000, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        
+                        // ==================== Toray HFU系列 - PVDF ====================
+                        { brand: 'Toray', model: 'HFU-2020', material: 'PVDF', area: 50, mwco: 150, flux: 55, type: 'uf_pvdf',
+                          description: '外压式超滤膜，膜面积50m²',
+                          length: 1860, diameter: 200, weight: 35, maxTemp: 40, maxPressure: 5.0,
+                          phRange: '2-11', cleaningPh: '1-13', maxChlorine: 2000, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        { brand: 'Toray', model: 'HFU-1020', material: 'PVDF', area: 25, mwco: 150, flux: 55, type: 'uf_pvdf',
+                          description: '外压式超滤膜，膜面积25m²，小型系统',
+                          length: 1860, diameter: 165, weight: 18, maxTemp: 40, maxPressure: 5.0,
+                          phRange: '2-11', cleaningPh: '1-13', maxChlorine: 2000, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        { brand: 'Toray', model: 'HFU-2010', material: 'PVDF', area: 50, mwco: 150, flux: 70, type: 'uf_pvdf',
+                          description: '外压式超滤膜，高通量设计',
+                          length: 1860, diameter: 200, weight: 35, maxTemp: 40, maxPressure: 5.0,
+                          phRange: '2-11', cleaningPh: '1-13', maxChlorine: 2000, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        
+                        // ==================== Pentair X-Flow系列 - PES ====================
+                        { brand: 'Pentair', model: 'X-Flow HFS60', material: 'PES', area: 50, mwco: 100, flux: 50, type: 'uf_pes',
+                          description: 'PES材质，截留分子量100kDa，适合蛋白质分离',
+                          length: 1170, diameter: 200, weight: 28, maxTemp: 40, maxPressure: 4.0,
+                          phRange: '2-10', cleaningPh: '1-13', maxChlorine: 500, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        { brand: 'Pentair', model: 'X-Flow HFW60', material: 'PES', area: 50, mwco: 100, flux: 50, type: 'uf_pes',
+                          description: 'PES材质，适合食品和饮料应用',
+                          length: 1170, diameter: 200, weight: 28, maxTemp: 40, maxPressure: 4.0,
+                          phRange: '2-10', cleaningPh: '1-13', maxChlorine: 500, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        { brand: 'Pentair', model: 'X-Flow HFW1000', material: 'PES', area: 33, mwco: 100, flux: 60, type: 'uf_pes',
+                          description: 'PES材质，紧凑型设计',
+                          length: 1140, diameter: 165, weight: 20, maxTemp: 40, maxPressure: 4.0,
+                          phRange: '2-10', cleaningPh: '1-13', maxChlorine: 500, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        
+                        // ==================== Asahi Kasei Microza系列 - PS ====================
+                        { brand: 'Asahi Kasei', model: 'Microza UNA-620A', material: 'PS', area: 60, mwco: 50, flux: 45, type: 'uf_ps',
+                          description: 'PS材质，截留分子量50kDa，高精度过滤',
+                          length: 1250, diameter: 200, weight: 32, maxTemp: 45, maxPressure: 3.0,
+                          phRange: '2-11', cleaningPh: '1-13', maxChlorine: 100, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        { brand: 'Asahi Kasei', model: 'Microza UNA-620B', material: 'PS', area: 40, mwco: 50, flux: 45, type: 'uf_ps',
+                          description: 'PS材质，膜面积40m²',
+                          length: 850, diameter: 200, weight: 22, maxTemp: 45, maxPressure: 3.0,
+                          phRange: '2-11', cleaningPh: '1-13', maxChlorine: 100, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        { brand: 'Asahi Kasei', model: 'Microza UNA-620AB', material: 'PS', area: 60, mwco: 30, flux: 40, type: 'uf_ps',
+                          description: 'PS材质，截留分子量30kDa，高精度',
+                          length: 1250, diameter: 200, weight: 32, maxTemp: 45, maxPressure: 3.0,
+                          phRange: '2-11', cleaningPh: '1-13', maxChlorine: 100, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        
+                        // ==================== Koch Membrane Systems - PAN ====================
+                        { brand: 'Koch', model: 'V8072-35-PMC', material: 'PAN', area: 46, mwco: 30, flux: 40, type: 'uf_pan',
+                          description: 'PAN材质，截留分子量30kDa，耐溶剂',
+                          length: 1200, diameter: 200, weight: 26, maxTemp: 50, maxPressure: 4.0,
+                          phRange: '2-12', cleaningPh: '1-13', maxChlorine: 50, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' },
+                        { brand: 'Koch', model: 'V8072-20-PMC', material: 'PAN', area: 46, mwco: 20, flux: 35, type: 'uf_pan',
+                          description: 'PAN材质，截留分子量20kDa，高精度',
+                          length: 1200, diameter: 200, weight: 26, maxTemp: 50, maxPressure: 4.0,
+                          phRange: '2-12', cleaningPh: '1-13', maxChlorine: 50, typicalTurbidity: '<0.1 NTU', typicalSDI: '<2.5' }
+                    ],
+                    // 纳滤膜数据库 - 基于FilmTec技术手册
+                    nfMembranes: [
+                        // ==================== FilmTec NF系列 ====================
+                        { brand: 'Dow Filmtec', model: 'NF270-400/34i', flow: 14700, rejection: 80, area: 400, pressure: 70, category: 'nf',
+                          description: '高透盐纳滤膜，对有机物高去除率，对盐类低去除率，适合有机物去除和软化',
+                          maxTemp: 45, phRange: '2-11', cleaningPh: '1-13', typicalApplications: '有机物去除、部分软化、废水处理' },
+                        { brand: 'Dow Filmtec', model: 'NF270-4040', flow: 3200, rejection: 80, area: 85, pressure: 70, category: 'nf',
+                          description: '4英寸高透盐纳滤膜',
+                          maxTemp: 45, phRange: '2-11', cleaningPh: '1-13', typicalApplications: '小型系统有机物去除' },
+                        { brand: 'Dow Filmtec', model: 'NF90-400/34i', flow: 10500, rejection: 97, area: 400, pressure: 150, category: 'nf',
+                          description: '高脱盐纳滤膜，对二价离子高去除率，对一价离子中等去除率',
+                          maxTemp: 45, phRange: '2-11', cleaningPh: '1-13', typicalApplications: '饮用水净化、硝酸盐去除、部分脱盐' },
+                        { brand: 'Dow Filmtec', model: 'NF90-4040', flow: 2400, rejection: 97, area: 85, pressure: 150, category: 'nf',
+                          description: '4英寸高脱盐纳滤膜',
+                          maxTemp: 45, phRange: '2-11', cleaningPh: '1-13', typicalApplications: '小型饮用水系统' },
+                        { brand: 'Dow Filmtec', model: 'NF-400', flow: 10500, rejection: 90, area: 400, pressure: 100, category: 'nf',
+                          description: '标准纳滤膜，平衡脱盐和透盐性能',
+                          maxTemp: 45, phRange: '2-11', cleaningPh: '1-13', typicalApplications: '软化、色度去除、有机物去除' },
+                        
+                        // ==================== Hydranautics NF系列 ====================
+                        { brand: 'Hydranautics', model: 'ESNA1-LF-LD', flow: 11000, rejection: 85, area: 400, pressure: 75, category: 'nf',
+                          description: '低污染纳滤膜，适合高有机物进水',
+                          maxTemp: 45, phRange: '2-11', cleaningPh: '1-13', typicalApplications: '地表水处理、废水回用' },
+                        { brand: 'Hydranautics', model: 'ESNA1-LF2-LD', flow: 12000, rejection: 85, area: 440, pressure: 75, category: 'nf',
+                          description: '低污染纳滤膜440ft²',
+                          maxTemp: 45, phRange: '2-11', cleaningPh: '1-13', typicalApplications: '大型系统地表水处理' },
+                        { brand: 'Hydranautics', model: 'ESNA4-LD', flow: 10500, rejection: 95, area: 400, pressure: 150, category: 'nf',
+                          description: '高脱盐纳滤膜',
+                          maxTemp: 45, phRange: '2-11', cleaningPh: '1-13', typicalApplications: '饮用水净化、硝酸盐去除' },
+                        
+                        // ==================== Toray NF系列 ====================
+                        { brand: 'Toray', model: 'TMN20H-400', flow: 11000, rejection: 85, area: 400, pressure: 70, category: 'nf',
+                          description: '高通量纳滤膜',
+                          maxTemp: 45, phRange: '2-11', cleaningPh: '1-13', typicalApplications: '软化、有机物去除' },
+                        { brand: 'Toray', model: 'TMN20-400', flow: 9500, rejection: 90, area: 400, pressure: 100, category: 'nf',
+                          description: '标准纳滤膜',
+                          maxTemp: 45, phRange: '2-11', cleaningPh: '1-13', typicalApplications: '饮用水处理、废水回用' },
+                        { brand: 'Toray', model: 'TMN10-400', flow: 8000, rejection: 95, area: 400, pressure: 150, category: 'nf',
+                          description: '高脱盐纳滤膜',
+                          maxTemp: 45, phRange: '2-11', cleaningPh: '1-13', typicalApplications: '高品质饮用水、部分脱盐' }
+                    ],
+                    
+                    // 扩展南方泵业数据库
+                    pumps: [
+                        // CDL/CDLF系列 - 立式多级离心泵
+                        { model: 'CDL2-110', flow: 2, head: 110, power: 1.5, rpm: 2900, series: 'cdl', description: '小型高压泵，适合实验室或小型RO系统', recommended: false },
+                        { model: 'CDL4-120', flow: 4, head: 120, power: 3, rpm: 2900, series: 'cdl', description: '小型高压泵，适合小型RO系统', recommended: false },
+                        { model: 'CDL8-120', flow: 8, head: 120, power: 5.5, rpm: 2900, series: 'cdl', description: '中型高压泵，适合中小型RO系统', recommended: false },
+                        { model: 'CDL12-120', flow: 12, head: 120, power: 7.5, rpm: 2900, series: 'cdl', description: '中型高压泵，适合中型RO系统', recommended: false },
+                        { model: 'CDL16-120', flow: 16, head: 120, power: 11, rpm: 2900, series: 'cdl', description: '标准高压泵，适合中型RO系统', recommended: false },
+                        { model: 'CDL20-100', flow: 20, head: 100, power: 11, rpm: 2900, series: 'cdl', description: '标准高压泵，适合中型RO系统', recommended: false },
+                        { model: 'CDL32-90', flow: 32, head: 90, power: 15, rpm: 2900, series: 'cdl', description: '大流量高压泵，适合大型RO系统', recommended: false },
+                        { model: 'CDL42-80', flow: 42, head: 80, power: 15, rpm: 2900, series: 'cdl', description: '大流量高压泵，适合大型RO系统', recommended: false },
+                        { model: 'CDL65-70', flow: 65, head: 70, power: 18.5, rpm: 2900, series: 'cdl', description: '大流量高压泵，适合大型RO系统', recommended: false },
+                        { model: 'CDL85-60', flow: 85, head: 60, power: 22, rpm: 2900, series: 'cdl', description: '大流量高压泵，适合大型RO系统', recommended: false },
+                        { model: 'CDL120-50', flow: 120, head: 50, power: 30, rpm: 2900, series: 'cdl', description: '超大流量泵，适合超滤或预处理', recommended: false },
+                        { model: 'CDL150-40', flow: 150, head: 40, power: 30, rpm: 2900, series: 'cdl', description: '超大流量泵，适合超滤或预处理', recommended: false },
+                        // CHL/CHLF系列 - 卧式多级离心泵
+                        { model: 'CHL2-40', flow: 2, head: 40, power: 0.75, rpm: 2900, series: 'chlf', description: '卧式多级泵，适合增压或循环', recommended: false },
+                        { model: 'CHL4-50', flow: 4, head: 50, power: 1.5, rpm: 2900, series: 'chlf', description: '卧式多级泵，适合增压或循环', recommended: false },
+                        { model: 'CHL8-50', flow: 8, head: 50, power: 2.2, rpm: 2900, series: 'chlf', description: '卧式多级泵，适合增压或循环', recommended: false },
+                        { model: 'CHL12-40', flow: 12, head: 40, power: 3, rpm: 2900, series: 'chlf', description: '卧式多级泵，适合增压或循环', recommended: false },
+                        { model: 'CHL16-40', flow: 16, head: 40, power: 4, rpm: 2900, series: 'chlf', description: '卧式多级泵，适合增压或循环', recommended: false },
+                        { model: 'CHL20-30', flow: 20, head: 30, power: 4, rpm: 2900, series: 'chlf', description: '卧式多级泵，适合增压或循环', recommended: false },
+                        // TD系列 - 管道循环泵
+                        { model: 'TD32-18/2', flow: 6, head: 18, power: 0.55, rpm: 2900, series: 'td', description: '管道循环泵，适合小流量循环', recommended: false },
+                        { model: 'TD40-25/2', flow: 12, head: 25, power: 1.5, rpm: 2900, series: 'td', description: '管道循环泵，适合中流量循环', recommended: false },
+                        { model: 'TD50-35/2', flow: 18, head: 35, power: 3, rpm: 2900, series: 'td', description: '管道循环泵，适合中流量循环', recommended: false },
+                        { model: 'TD65-40/2', flow: 25, head: 40, power: 5.5, rpm: 2900, series: 'td', description: '管道循环泵，适合大流量循环', recommended: false },
+                        { model: 'TD80-47/2', flow: 42, head: 47, power: 11, rpm: 2900, series: 'td', description: '管道循环泵，适合大流量循环', recommended: false },
+                        { model: 'TD100-52/2', flow: 60, head: 52, power: 15, rpm: 2900, series: 'td', description: '管道循环泵，适合超大流量循环', recommended: false },
+                        { model: 'TD125-52/2', flow: 90, head: 52, power: 22, rpm: 2900, series: 'td', description: '管道循环泵，适合超大流量循环', recommended: false },
+                        { model: 'TD150-52/2', flow: 120, head: 52, power: 30, rpm: 2900, series: 'td', description: '管道循环泵，适合超大流量循环', recommended: false },
+                        // NISO系列 - 端吸离心泵
+                        { model: 'NISO32-160', flow: 6, head: 32, power: 1.5, rpm: 2900, series: 'niso', description: '端吸离心泵，适合原水输送', recommended: false },
+                        { model: 'NISO40-160', flow: 12, head: 32, power: 2.2, rpm: 2900, series: 'niso', description: '端吸离心泵，适合原水输送', recommended: false },
+                        { model: 'NISO50-160', flow: 18, head: 32, power: 3, rpm: 2900, series: 'niso', description: '端吸离心泵，适合原水输送', recommended: false },
+                        { model: 'NISO65-160', flow: 25, head: 32, power: 5.5, rpm: 2900, series: 'niso', description: '端吸离心泵，适合原水输送', recommended: false },
+                        { model: 'NISO80-160', flow: 42, head: 32, power: 7.5, rpm: 2900, series: 'niso', description: '端吸离心泵，适合原水输送', recommended: false },
+                        { model: 'NISO100-160', flow: 60, head: 32, power: 11, rpm: 2900, series: 'niso', description: '端吸离心泵，适合原水输送', recommended: false },
+                        { model: 'NISO125-160', flow: 90, head: 32, power: 15, rpm: 2900, series: 'niso', description: '端吸离心泵，适合原水输送', recommended: false },
+                        { model: 'NISO150-160', flow: 120, head: 32, power: 22, rpm: 2900, series: 'niso', description: '端吸离心泵，适合原水输送', recommended: false },
+                        
+                        // ==================== 新增南方泵业高压泵系列 ====================
+                        // CDM/CDMF系列 - 不锈钢多级泵(高压RO专用)
+                        { model: 'CDM3-220', flow: 3, head: 220, power: 4, rpm: 2900, series: 'cdm', description: '不锈钢高压泵，适合小型RO系统', recommended: false },
+                        { model: 'CDM5-200', flow: 5, head: 200, power: 5.5, rpm: 2900, series: 'cdm', description: '不锈钢高压泵，适合小型RO系统', recommended: false },
+                        { model: 'CDM10-160', flow: 10, head: 160, power: 11, rpm: 2900, series: 'cdm', description: '不锈钢高压泵，适合中型RO系统', recommended: false },
+                        { model: 'CDM15-140', flow: 15, head: 140, power: 15, rpm: 2900, series: 'cdm', description: '不锈钢高压泵，适合中型RO系统', recommended: false },
+                        { model: 'CDM20-120', flow: 20, head: 120, power: 15, rpm: 2900, series: 'cdm', description: '不锈钢高压泵，适合中型RO系统', recommended: false },
+                        { model: 'CDM32-100', flow: 32, head: 100, power: 18.5, rpm: 2900, series: 'cdm', description: '不锈钢高压泵，适合大型RO系统', recommended: false },
+                        { model: 'CDM42-90', flow: 42, head: 90, power: 18.5, rpm: 2900, series: 'cdm', description: '不锈钢高压泵，适合大型RO系统', recommended: false },
+                        { model: 'CDM65-80', flow: 65, head: 80, power: 22, rpm: 2900, series: 'cdm', description: '不锈钢高压泵，适合大型RO系统', recommended: false },
+                        { model: 'CDM85-70', flow: 85, head: 70, power: 30, rpm: 2900, series: 'cdm', description: '不锈钢高压泵，适合大型RO系统', recommended: false },
+                        
+                        // CDLF-JY系列 - 高压泵专用系列
+                        { model: 'CDLF-JY8-160', flow: 8, head: 160, power: 7.5, rpm: 2900, series: 'cdlf', description: '高压泵专用，适合海水淡化', recommended: false },
+                        { model: 'CDLF-JY12-140', flow: 12, head: 140, power: 11, rpm: 2900, series: 'cdlf', description: '高压泵专用，适合海水淡化', recommended: false },
+                        { model: 'CDLF-JY16-130', flow: 16, head: 130, power: 15, rpm: 2900, series: 'cdlf', description: '高压泵专用，适合海水淡化', recommended: false },
+                        { model: 'CDLF-JY20-120', flow: 20, head: 120, power: 15, rpm: 2900, series: 'cdlf', description: '高压泵专用，适合海水淡化', recommended: false },
+                        
+                        // ZS系列 - 不锈钢卧式单级泵
+                        { model: 'ZS50-32-200', flow: 12.5, head: 50, power: 5.5, rpm: 2900, series: 'zs', description: '不锈钢卧式泵，适合增压', recommended: false },
+                        { model: 'ZS65-40-200', flow: 25, head: 50, power: 7.5, rpm: 2900, series: 'zs', description: '不锈钢卧式泵，适合增压', recommended: false },
+                        { model: 'ZS80-50-200', flow: 50, head: 50, power: 15, rpm: 2900, series: 'zs', description: '不锈钢卧式泵，适合增压', recommended: false },
+                        { model: 'ZS100-65-200', flow: 100, head: 50, power: 22, rpm: 2900, series: 'zs', description: '不锈钢卧式泵，适合增压', recommended: false },
+                        
+                        // QS系列 - 潜水泵(原水泵)
+                        { model: 'QS200-15-15', flow: 200, head: 15, power: 15, rpm: 2900, series: 'qs', description: '潜水泵，适合深井取水', recommended: false },
+                        { model: 'QS250-12-15', flow: 250, head: 12, power: 15, rpm: 2900, series: 'qs', description: '潜水泵，适合深井取水', recommended: false },
+                        { model: 'QS300-10-15', flow: 300, head: 10, power: 15, rpm: 2900, series: 'qs', description: '潜水泵，适合深井取水', recommended: false },
+                        
+                        // WQ系列 - 污水泵(废水回用)
+                        { model: 'WQ10-15-1.5', flow: 10, head: 15, power: 1.5, rpm: 2900, series: 'wq', description: '污水泵，适合废水回用', recommended: false },
+                        { model: 'WQ15-15-2.2', flow: 15, head: 15, power: 2.2, rpm: 2900, series: 'wq', description: '污水泵，适合废水回用', recommended: false },
+                        { model: 'WQ25-15-3', flow: 25, head: 15, power: 3, rpm: 2900, series: 'wq', description: '污水泵，适合废水回用', recommended: false },
+                        { model: 'WQ40-15-4', flow: 40, head: 15, power: 4, rpm: 2900, series: 'wq', description: '污水泵，适合废水回用', recommended: false }
+                    ]
+                };
+            },
+            computed: {
+                // 使用缓存优化计算属性
+                calculated() {
+                    const feed = parseFloat(this.designFlow.feed) || 0;
+                    const permeate = parseFloat(this.designFlow.permeate) || 0;
+                    const concentrate = feed - permeate;
+                    const recovery = feed > 0 ? ((permeate / feed) * 100).toFixed(1) : 0;
+                    const cf = concentrate > 0 ? (feed / concentrate).toFixed(2) : 0;
+                    return { concentrate: concentrate.toFixed(1), actualRecovery: recovery, cf };
+                },
+                totalElements() {
+                    const { vesselsStage1, vesselsStage2, vesselsStage3, stages, elementsPerVessel } = this.config;
+                    let total = vesselsStage1 * elementsPerVessel;
+                    if (stages >= 2) total += (vesselsStage2 || 0) * elementsPerVessel;
+                    if (stages >= 3) total += (vesselsStage3 || 0) * elementsPerVessel;
+                    return total;
+                },
+                totalVessels() {
+                    const { vesselsStage1, vesselsStage2, vesselsStage3, stages } = this.config;
+                    let total = vesselsStage1;
+                    if (stages >= 2) total += vesselsStage2 || 0;
+                    if (stages >= 3) total += vesselsStage3 || 0;
+                    return total;
+                },
+                // 缓存选中的膜对象，避免重复查找
+                selectedMembraneObj() {
+                    return this.membranes.find(m => m.model === this.selectedMembrane) || null;
+                },
+                theoreticalFlow() {
+                    const selected = this.selectedMembraneObj;
+                    if (!selected) return 0;
+                    return ((selected.flow * 0.003785 * this.totalElements) / 24).toFixed(1);
+                },
+                flux() {
+                    const selected = this.selectedMembraneObj;
+                    if (!selected || this.totalElements === 0) return 0;
+                    const flow = parseFloat(this.designFlow.permeate) || 0;
+                    const area = selected.area * 0.0929 * this.totalElements;
+                    return area > 0 ? (flow / area).toFixed(1) : 0;
+                },
+                // RO膜分类筛选 - 使用Map优化查找
+                filteredMembranes() {
+                    if (this.membraneFilter === 'all') return this.membranes;
+                    // 预分配数组容量优化
+                    return this.membranes.filter(m => m.category === this.membraneFilter);
+                },
+                // 超滤膜筛选 - 提取为计算属性避免v-for内联过滤
+                filteredUFMembranes() {
+                    if (this.processConfig.ufSystem === 'none') return [];
+                    return this.ufMembranes.filter(m => m.type === this.processConfig.ufSystem);
+                },
+                // 水泵分类筛选 - 优化排序算法
+                filteredPumps() {
+                    const { pumpFilter, designFlow, pumps } = this;
+                    let filtered = pumpFilter === 'all' ? pumps : pumps.filter(p => p.series === pumpFilter);
+                    
+                    const feed = parseFloat(designFlow.feed) || 0;
+                    if (feed === 0) return filtered;
+                    
+                    // 单次遍历完成映射和排序准备
+                    const mapped = filtered.map(p => {
+                        const diff = Math.abs(p.flow - feed);
+                        const flowMatch = Math.min(100, Math.max(0, 100 - diff / Math.max(feed, 1) * 100));
+                        return { ...p, match: Math.round(flowMatch), recommended: flowMatch > 80, diff };
+                    });
+                    
+                    // 使用稳定排序
+                    return mapped.sort((a, b) => b.match - a.match);
+                },
+                // 智能推荐水泵型号 - 复用filteredPumps结果
+                recommendedPumpModel() {
+                    const pumps = this.filteredPumps;
+                    if (pumps.length === 0) return '';
+                    // 找到匹配度最高的
+                    return pumps.reduce((best, current) => (current.match > best.match ? current : best), pumps[0]).model;
+                },
+                // 工艺流程描述
+                processFlowDescription() {
+                    const parts = [];
+                    if (this.processConfig.pretreatment !== 'none') {
+                        const preMap = {
+                            'multimedia': '多介质过滤',
+                            'activated_carbon': '活性炭过滤',
+                            'multimedia+carbon': '多介质+活性炭',
+                            'softening': '软化处理'
+                        };
+                        parts.push(preMap[this.processConfig.pretreatment]);
+                    }
+                    if (this.processConfig.precisionFilter !== 'none') {
+                        parts.push(this.precisionFilterName);
+                    }
+                    if (this.processConfig.ufSystem !== 'none') {
+                        parts.push('超滤');
+                    }
+                    if (this.processConfig.mainProcess === 'ro') parts.push('RO反渗透');
+                    if (this.processConfig.mainProcess === 'nf') parts.push('纳滤NF');
+                    if (this.processConfig.mainProcess === 'ro+edi') parts.push('RO+EDI');
+                    if (this.processConfig.mainProcess === 'ro+mixed') parts.push('RO+混床');
+                    return parts.join(' → ') || '请选择工艺';
+                },
+                // 精密过滤器名称
+                precisionFilterName() {
+                    const names = {
+                        '50um': '50μm 袋式过滤',
+                        '10um': '10μm 滤芯',
+                        '5um': '5μm 保安过滤',
+                        '1um': '1μm 精密过滤',
+                        '0.45um': '0.45μm 微滤'
+                    };
+                    return names[this.processConfig.precisionFilter] || '';
+                }
+            },
+            methods: {
+                // 性能监控工具
+                _perfLog: {},
+                perfStart(label) {
+                    this._perfLog[label] = performance.now();
+                },
+                perfEnd(label) {
+                    const start = this._perfLog[label];
+                    if (start) {
+                        const duration = performance.now() - start;
+                        console.log(`[Performance] ${label}: ${duration.toFixed(2)}ms`);
+                        delete this._perfLog[label];
+                        return duration;
+                    }
+                    return 0;
+                },
+                
+                // 错误处理包装器
+                safeExecute(fn, errorMessage = '操作失败') {
+                    try {
+                        return fn();
+                    } catch (error) {
+                        console.error(`[Error] ${errorMessage}:`, error);
+                        alert(`${errorMessage}，请稍后重试`);
+                        return null;
+                    }
+                },
+                
+                goToStep(index) { 
+                    if (index <= this.currentStep + 1) this.currentStep = index; 
+                },
+                nextStep() { 
+                    if (this.currentStep < 5) this.currentStep++; 
+                },
+                prevStep() { 
+                    if (this.currentStep > 0) this.currentStep--; 
+                },
+                triggerUpload(type) { 
+                    this.$refs[type + 'FileInput'].click(); 
+                },
+                handleFileSelect(event, type) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    
+                    // 文件大小检查 (最大10MB)
+                    const maxSize = 10 * 1024 * 1024;
+                    if (file.size > maxSize) {
+                        alert('文件大小超过10MB限制，请选择较小的文件');
+                        return;
+                    }
+                    
+                    if (type === 'inlet') this.inletReport = file; 
+                    else this.outletReport = file; 
+                    
+                    // 如果是进水报告上传，自动触发解析
+                    if (type === 'inlet') {
+                        this.$nextTick(() => {
+                            // 延迟执行，让用户先看到上传成功的状态
+                            setTimeout(() => {
+                                this.analyzeReportsWithGemini();
+                            }, 500);
+                        });
+                    }
+                },
+                // 分析粘贴的文本内容 - 带预览功能
+                analyzePastedText() {
+                    if (!this.pastedReportText || this.pastedReportText.trim().length < 10) {
+                        alert('请粘贴水质报告内容后再进行解析');
+                        return;
+                    }
+                    
+                    this.perfStart('analyzePastedText');
+                    this.analyzing = true;
+                    
+                    // 使用setTimeout让UI有时间更新
+                    setTimeout(() => {
+                        try {
+                            const result = this.extractWaterQualityFromText(this.pastedReportText);
+                            
+                            // 显示预览面板
+                            this.showParsePreview({
+                                inlet: result.parsedData,
+                                outlet: {},
+                                confidence: result.confidence,
+                                source: 'text'
+                            });
+                            
+                        } catch (error) {
+                            console.error('文本解析出错:', error);
+                            alert('解析过程出现错误，请检查文本格式');
+                        } finally {
+                            this.analyzing = false;
+                            this.perfEnd('analyzePastedText');
+                        }
+                    }, 100);
+                },
+                
+                // AI 分析水质报告 - 支持PDF/图片直接解析
+                async analyzeReportsWithGemini() {
+                    this.perfStart('analyzeReports');
+                    this.analyzing = true;
+                    
+                    try {
+                        // 检查是否是PDF或图片文件，需要特殊处理
+                        const isPDF = this.inletReport && (this.inletReport.name.toLowerCase().endsWith('.pdf') || this.inletReport.type.includes('pdf'));
+                        const isImage = this.inletReport && (this.inletReport.type.includes('image') || /\.(jpg|jpeg|png)$/i.test(this.inletReport.name));
+                        
+                        // 如果是PDF文件，显示提示信息
+                        if (isPDF) {
+                            alert('PDF文件暂不支持直接AI解析。\n\n请将PDF页面截图保存为图片后上传，或打开PDF复制其中的水质数据参数，然后粘贴到下方的"粘贴水质报告文本"区域进行智能解析。');
+                            this.analyzing = false;
+                            this.perfEnd('analyzeReports');
+                            
+                            // 滚动到文本粘贴区域
+                            this.$nextTick(() => {
+                                const pasteArea = document.querySelector('textarea[placeholder*="水质报告"]');
+                                if (pasteArea) {
+                                    pasteArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    pasteArea.focus();
+                                }
+                            });
+                            return;
+                        }
+                        
+                        // 如果是图片，使用AI直接解析
+                        if (isImage) {
+                            try {
+                                console.log('开始AI图片解析...');
+                                const aiResult = await this.extractTextFromFile(this.inletReport);
+                                console.log('AI原始返回:', aiResult);
+                                
+                                // 解析AI返回的JSON结果
+                                const parsedData = this.parseAIResult(aiResult);
+                                console.log('解析后的数据:', parsedData);
+                                
+                                // 检查解析结果
+                                const paramCount = Object.keys(parsedData).filter(k => !['missing_params','analysis','parse_error','raw_content'].includes(k)).length;
+                                console.log('识别到的参数数量:', paramCount);
+                                
+                                // 显示预览面板
+                                this.showParsePreview({
+                                    inlet: parsedData,
+                                    outlet: {},
+                                    confidence: 90, // AI解析置信度较高
+                                    source: 'ai',
+                                    missingParams: parsedData.missing_params || [],
+                                    analysis: parsedData.analysis || ''
+                                });
+                                
+                                this.analyzing = false;
+                                this.perfEnd('analyzeReports');
+                                return;
+                            } catch (aiError) {
+                                console.error('AI解析失败:', aiError);
+                                alert('AI解析失败: ' + aiError.message + '\n请尝试手动粘贴文本内容');
+                                this.analyzing = false;
+                                this.perfEnd('analyzeReports');
+                                return;
+                            }
+                        }
+                        
+                        // 并行提取文件内容（文本文件）
+                        const [inletContent, outletContent] = await Promise.all([
+                            this.inletReport ? this.extractTextFromFile(this.inletReport) : Promise.resolve(''),
+                            this.outletReport ? this.extractTextFromFile(this.outletReport) : Promise.resolve('')
+                        ]);
+                        
+                        // 使用requestAnimationFrame避免阻塞UI
+                        requestAnimationFrame(() => {
+                            try {
+                                // 检查是否是Office等无法直接解析的文件
+                                if (inletContent.includes('【Office文件:')) {
+                                    alert(inletContent.replace(/【.*?】\n提示: /, ''));
+                                    this.analyzing = false;
+                                    this.perfEnd('analyzeReports');
+                                    
+                                    // 滚动到文本粘贴区域
+                                    this.$nextTick(() => {
+                                        const pasteArea = document.querySelector('textarea[placeholder*="水质报告"]');
+                                        if (pasteArea) {
+                                            pasteArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                            pasteArea.focus();
+                                        }
+                                    });
+                                    return;
+                                }
+                                
+                                // 使用智能文本解析提取水质参数
+                                const inletResult = this.extractWaterQualityFromText(inletContent);
+                                const outletResult = outletContent ? this.extractWaterQualityFromText(outletContent) : { parsedData: {} };
+                                
+                                // 显示预览面板
+                                this.showParsePreview({
+                                    inlet: inletResult.parsedData,
+                                    outlet: outletResult.parsedData,
+                                    confidence: inletResult.confidence,
+                                    source: 'file'
+                                });
+                                
+                            } catch (error) {
+                                console.error('分析过程出错:', error);
+                                alert('水质分析过程出现错误，请检查文件格式');
+                            } finally {
+                                this.analyzing = false;
+                                this.perfEnd('analyzeReports');
+                            }
+                        });
+                    } catch (error) {
+                        console.error('文件读取失败:', error);
+                        alert('文件读取失败，请检查文件格式是否正确');
+                        this.analyzing = false;
+                        this.perfEnd('analyzeReports');
+                    }
+                },
+                
+                // 解析AI返回的结果
+                parseAIResult(aiResult) {
+                    try {
+                        // 尝试解析JSON
+                        let data;
+                        try {
+                            data = JSON.parse(aiResult);
+                        } catch (parseError) {
+                            // 尝试清理JSON字符串中的多余字符
+                            const cleaned = aiResult.replace(/^[^{]*/, '').replace(/[^}]*$/, '');
+                            data = JSON.parse(cleaned);
+                        }
+                        
+                        // 转换为统一的parsedData格式
+                        const parsedData = {};
+                        const allParams = [
+                            'ph', 'turbidity', 'sdi', 'conductivity', 'tss', 'temperature',
+                            'calcium', 'magnesium', 'sodium', 'potassium', 'iron', 'manganese', 'barium_strontium',
+                            'chloride', 'sulfate', 'nitrate', 'fluoride', 'bicarbonate', 'silica',
+                            'cod', 'bod', 'toc', 'color', 'bacteria',
+                            'chlorine', 'orp',
+                            'ammonia', 'tn', 'tp',
+                            'ss', 'tds', 'hardness'
+                        ];
+                        
+                        allParams.forEach(param => {
+                            if (data[param] !== undefined && data[param] !== null && data[param] !== 'null' && data[param] !== '未检测' && data[param] !== '无数据') {
+                                const value = parseFloat(data[param]);
+                                if (!isNaN(value)) {
+                                    parsedData[param] = {
+                                        value: value,
+                                        confidence: 95,
+                                        unit: this.getParamUnit(param)
+                                    };
+                                }
+                            }
+                        });
+                        
+                        // 保留缺失参数和分析信息
+                        parsedData.missing_params = data.missing_params || [];
+                        parsedData.analysis = data.analysis || '';
+                        
+                        return parsedData;
+                    } catch (e) {
+                        console.error('解析AI结果失败:', e);
+                        console.error('原始AI结果:', aiResult);
+                        // 如果JSON解析失败，返回包含错误信息的对象
+                        return {
+                            parse_error: true,
+                            raw_content: aiResult,
+                            missing_params: [],
+                            analysis: 'AI返回结果解析失败，请尝试手动输入水质参数'
+                        };
+                    }
+                },
+                
+                // 获取参数单位
+                getParamUnit(param) {
+                    const units = {
+                        ph: '', turbidity: 'NTU', sdi: '', conductivity: 'μs/cm', tss: 'mg/L', temperature: '°C',
+                        calcium: 'mg/L', magnesium: 'mg/L', sodium: 'mg/L', potassium: 'mg/L', iron: 'mg/L', manganese: 'mg/L', barium_strontium: 'mg/L',
+                        chloride: 'mg/L', sulfate: 'mg/L', nitrate: 'mg/L', fluoride: 'mg/L', bicarbonate: 'mg/L', silica: 'mg/L',
+                        cod: 'mg/L', bod: 'mg/L', toc: 'mg/L', color: '倍', bacteria: 'CFU/mL',
+                        chlorine: 'mg/L', orp: 'mV',
+                        ammonia: 'mg/L', tn: 'mg/L', tp: 'mg/L',
+                        ss: 'mg/L', tds: 'mg/L', hardness: 'mg/L'
+                    };
+                    return units[param] || '';
+                },
+                // 从文件中提取文本 - 支持PDF/图片通过AI解析
+                extractTextFromFile(file) {
+                    return new Promise((resolve, reject) => {
+                        if (!file) {
+                            resolve('');
+                            return;
+                        }
+                        
+                        const fileType = file.type;
+                        const fileName = file.name.toLowerCase();
+                        
+                        // PDF文件 - 提示用户转换为图片或粘贴文本
+                        if (fileName.endsWith('.pdf') || fileType.includes('pdf')) {
+                            resolve(`【PDF文件: ${file.name}】\n提示: PDF文件暂不支持直接AI解析。请将PDF页面截图保存为图片后上传，或打开PDF复制其中的水质数据参数（如pH、浊度、COD、TDS等），然后粘贴到下方的"粘贴水质报告文本"区域进行智能解析。`);
+                            return;
+                        }
+                        
+                        // 图片文件 - 通过硅基流动API解析
+                        if (fileType.includes('image') || fileName.endsWith('.jpg') || fileName.endsWith('.jpeg') || fileName.endsWith('.png')) {
+                            this.parseImageWithAI(file).then(result => {
+                                resolve(result);
+                            }).catch(err => {
+                                console.error('图片解析失败:', err);
+                                resolve(`【图片文件: ${file.name}】\n提示: 图片自动解析失败，请手动查看图片并输入水质数据。错误: ${err.message}`);
+                            });
+                            return;
+                        }
+                        
+                        // Word/Excel文件提示
+                        if (fileName.endsWith('.doc') || fileName.endsWith('.docx') || 
+                            fileName.endsWith('.xls') || fileName.endsWith('.xlsx')) {
+                            resolve(`【Office文件: ${file.name}】\n提示: Word/Excel文件无法直接自动解析。请打开文件，复制其中的水质数据参数（如pH、浊度、COD、TDS等），然后粘贴到下方的"粘贴水质报告文本"区域进行智能解析。`);
+                            return;
+                        }
+                        
+                        // 文本文件直接读取
+                        if (fileType.includes('text') || fileName.endsWith('.txt') || fileName.endsWith('.csv')) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => resolve(e.target.result);
+                            reader.onerror = () => reject(new Error('读取文件失败'));
+                            reader.readAsText(file);
+                        }
+                        // 尝试读取其他文件为文本
+                        else {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const content = e.target.result;
+                                const textContent = this.extractReadableText(content);
+                                if (textContent && textContent.length > 50) {
+                                    resolve(textContent);
+                                } else {
+                                    resolve(`【文件: ${file.name}】\n提示: 此格式文件无法直接自动解析。请手动复制报告中的水质数据参数（如pH、浊度、COD、TDS等）并粘贴到下方文本框中。`);
+                                }
+                            };
+                            reader.onerror = () => reject(new Error('读取文件失败'));
+                            reader.readAsText(file);
+                        }
+                    });
+                },
+                
+                // 使用硅基流动API解析PDF文件
+                async parsePDFWithAI(file) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = async (e) => {
+                            try {
+                                const base64Data = e.target.result.split(',')[1];
+                                const result = await this.callSiliconFlowAPI(base64Data, file.name, 'pdf');
+                                resolve(result);
+                            } catch (error) {
+                                reject(error);
+                            }
+                        };
+                        reader.onerror = () => reject(new Error('读取PDF文件失败'));
+                        reader.readAsDataURL(file);
+                    });
+                },
+                
+                // 使用硅基流动API解析图片文件
+                async parseImageWithAI(file) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = async (e) => {
+                            try {
+                                const base64Data = e.target.result.split(',')[1];
+                                const result = await this.callSiliconFlowAPI(base64Data, file.name, 'image');
+                                resolve(result);
+                            } catch (error) {
+                                reject(error);
+                            }
+                        };
+                        reader.onerror = () => reject(new Error('读取图片文件失败'));
+                        reader.readAsDataURL(file);
+                    });
+                },
+                
+                // 调用硅基流动API
+                async callSiliconFlowAPI(base64Data, fileName, fileType) {
+                    const apiKey = 'sk-wnnxtxyofvmtmykecdrbrmmukhhcigbrviobtjmlkvjjdyvr';
+                    const model = 'deepseek-ai/DeepSeek-V3.2';
+                    
+                    const prompt = `请仔细分析这份水质报告文件，提取以下所有水质参数（如果报告中没有某项参数，请标注"未检测"或"无数据"）。
+
+需要提取的参数列表：
+1. 基础理化：pH值、浊度(NTU)、SDI₁₅污染指数、电导率(μs/cm)、总悬浮固体TSS(mg/L)、水温(°C)
+2. 阳离子：钙Ca²⁺(mg/L)、镁Mg²⁺(mg/L)、钠Na⁺(mg/L)、钾K⁺(mg/L)、铁Total Fe(mg/L)、锰Mn²⁺(mg/L)、钡/锶Ba²⁺/Sr²⁺(mg/L)
+3. 阴离子：氯离子Cl⁻(mg/L)、硫酸根SO₄²⁻(mg/L)、硝酸根NO₃⁻(mg/L)、氟离子F⁻(mg/L)、重碳酸根HCO₃⁻(mg/L)、二氧化硅SiO₂(mg/L)
+4. 有机/生物：CODcr(mg/L)、BOD₅(mg/L)、TOC总有机碳(mg/L)、色度(倍)、细菌总数(CFU/mL)
+5. 安全性指标：余氯Free Cl₂(mg/L)、ORP氧化还原电位(mV)
+6. 营养盐：氨氮NH₃-N(mg/L)、总氮TN(mg/L)、总磷TP(mg/L)
+7. 其他：悬浮物SS(mg/L)、TDS(mg/L)、总硬度(mg/L)
+
+请按以下JSON格式返回结果（只返回JSON，不要其他说明文字）：
+{
+  "ph": "值或null",
+  "turbidity": "值或null",
+  "sdi": "值或null",
+  "conductivity": "值或null",
+  "tss": "值或null",
+  "temperature": "值或null",
+  "calcium": "值或null",
+  "magnesium": "值或null",
+  "sodium": "值或null",
+  "potassium": "值或null",
+  "iron": "值或null",
+  "manganese": "值或null",
+  "barium_strontium": "值或null",
+  "chloride": "值或null",
+  "sulfate": "值或null",
+  "nitrate": "值或null",
+  "fluoride": "值或null",
+  "bicarbonate": "值或null",
+  "silica": "值或null",
+  "cod": "值或null",
+  "bod": "值或null",
+  "toc": "值或null",
+  "color": "值或null",
+  "bacteria": "值或null",
+  "chlorine": "值或null",
+  "orp": "值或null",
+  "ammonia": "值或null",
+  "tn": "值或null",
+  "tp": "值或null",
+  "ss": "值或null",
+  "tds": "值或null",
+  "hardness": "值或null",
+  "missing_params": ["未检测的参数列表"],
+  "analysis": "水质简要分析"
+}`;
+
+                    // 构建消息内容 - 硅基流动API使用image_url格式传递base64图片
+                    const content = [
+                        { type: 'text', text: prompt }
+                    ];
+                    
+                    // 图片使用image_url格式
+                    if (fileType === 'image') {
+                        content.push({
+                            type: 'image_url',
+                            image_url: {
+                                url: `data:image/jpeg;base64,${base64Data}`
+                            }
+                        });
+                    }
+                    // PDF文件暂不支持直接上传，提示用户
+                    else if (fileType === 'pdf') {
+                        throw new Error('PDF文件暂不支持直接AI解析，请将PDF转换为图片后上传，或复制PDF中的文本内容粘贴到下方文本框进行解析。');
+                    }
+                    
+                    const requestBody = {
+                        model: model,
+                        messages: [
+                            {
+                                role: 'user',
+                                content: content
+                            }
+                        ],
+                        stream: false,
+                        max_tokens: 4096,
+                        temperature: 0.3
+                    };
+                    
+                    try {
+                        const response = await fetch('https://api.siliconflow.cn/v1/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${apiKey}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(requestBody)
+                        });
+                        
+                        if (!response.ok) {
+                            const errorData = await response.json().catch(() => ({}));
+                            throw new Error(`API请求失败: ${response.status} - ${errorData.error?.message || response.statusText}`);
+                        }
+                        
+                        const data = await response.json();
+                        const content = data.choices?.[0]?.message?.content || '';
+                        
+                        // 尝试从响应中提取JSON
+                        const jsonMatch = content.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) {
+                            return jsonMatch[0];
+                        }
+                        
+                        return content;
+                    } catch (error) {
+                        console.error('硅基流动API调用失败:', error);
+                        throw error;
+                    }
+                },
+                
+                // 从二进制内容中提取可读的文本
+                extractReadableText(content) {
+                    if (!content) return '';
+                    // 保留可打印字符（包括中文）
+                    return content.replace(/[^\x20-\x7E\u4e00-\u9fa5\n\r\t]/g, ' ')
+                                  .replace(/\s+/g, ' ')
+                                  .trim();
+                },
+                // 参数配置 - 包含名称、单位、范围、转换系数
+                getParamConfig() {
+                    return {
+                        // 基础理化
+                        ph: { label: 'pH值', unit: '', min: 0, max: 14, patterns: ['ph', '酸碱度'] },
+                        turbidity: { label: '浊度', unit: 'NTU', min: 0, max: 10000, patterns: ['浊度', 'turbidity', '浑浊度'] },
+                        sdi: { label: 'SDI₁₅', unit: '', min: 0, max: 20, patterns: ['sdi', '污染指数', 'silt density index'] },
+                        conductivity: { label: '电导率', unit: 'μs/cm', min: 0, max: 1000000, patterns: ['电导率', 'conductivity'] },
+                        tss: { label: '总悬浮固体TSS', unit: 'mg/L', min: 0, max: 100000, patterns: ['tss', '总悬浮固体'] },
+                        temperature: { label: '水温', unit: '°C', min: 0, max: 100, patterns: ['水温', '温度', 'temperature'] },
+                        // 阳离子
+                        calcium: { label: '钙(Ca²⁺)', unit: 'mg/L', min: 0, max: 2000, patterns: ['钙', 'calcium', 'ca'] },
+                        magnesium: { label: '镁(Mg²⁺)', unit: 'mg/L', min: 0, max: 1000, patterns: ['镁', 'magnesium', 'mg'] },
+                        sodium: { label: '钠(Na⁺)', unit: 'mg/L', min: 0, max: 50000, patterns: ['钠', 'sodium', 'na'] },
+                        potassium: { label: '钾(K⁺)', unit: 'mg/L', min: 0, max: 5000, patterns: ['钾', 'potassium', 'k'] },
+                        iron: { label: '铁(Total Fe)', unit: 'mg/L', min: 0, max: 100, patterns: ['铁', 'fe', '总铁'] },
+                        manganese: { label: '锰(Mn²⁺)', unit: 'mg/L', min: 0, max: 50, patterns: ['锰', 'mn'] },
+                        barium_strontium: { label: '钡/锶(Ba²⁺/Sr²⁺)', unit: 'mg/L', min: 0, max: 100, patterns: ['钡', '锶', 'barium', 'strontium', 'ba', 'sr'] },
+                        // 阴离子
+                        chloride: { label: '氯离子(Cl⁻)', unit: 'mg/L', min: 0, max: 100000, patterns: ['氯离子', 'chloride', 'cl'] },
+                        sulfate: { label: '硫酸根(SO₄²⁻)', unit: 'mg/L', min: 0, max: 50000, patterns: ['硫酸根', 'sulfate', 'so4'] },
+                        nitrate: { label: '硝酸根(NO₃⁻)', unit: 'mg/L', min: 0, max: 10000, patterns: ['硝酸根', 'nitrate', 'no3'] },
+                        fluoride: { label: '氟离子(F⁻)', unit: 'mg/L', min: 0, max: 100, patterns: ['氟离子', '氟化物', 'fluoride', 'f'] },
+                        bicarbonate: { label: '重碳酸根(HCO₃⁻)', unit: 'mg/L', min: 0, max: 10000, patterns: ['重碳酸根', '碳酸氢根', 'bicarbonate', 'hco3'] },
+                        silica: { label: '二氧化硅(SiO₂)', unit: 'mg/L', min: 0, max: 500, patterns: ['二氧化硅', '硅', 'silica', 'sio2'] },
+                        // 有机/生物
+                        cod: { label: 'CODcr', unit: 'mg/L', min: 0, max: 100000, patterns: ['cod', '化学需氧量'] },
+                        bod: { label: 'BOD₅', unit: 'mg/L', min: 0, max: 100000, patterns: ['bod', '生化需氧量'] },
+                        toc: { label: 'TOC(总有机碳)', unit: 'mg/L', min: 0, max: 50000, patterns: ['toc', '总有机碳'] },
+                        color: { label: '色度', unit: '倍', min: 0, max: 1000, patterns: ['色度', 'color'] },
+                        bacteria: { label: '细菌总数', unit: 'CFU/mL', min: 0, max: 10000000, patterns: ['细菌总数', '菌落总数', 'bacteria', 'cfu'] },
+                        // 安全性指标
+                        chlorine: { label: '余氯(Free Cl₂)', unit: 'mg/L', min: 0, max: 50, patterns: ['余氯', '游离氯', 'chlorine', 'cl'] },
+                        orp: { label: 'ORP(氧化还原电位)', unit: 'mV', min: -1000, max: 1000, patterns: ['orp', '氧化还原电位'] },
+                        // 营养盐
+                        ammonia: { label: '氨氮(NH₃-N)', unit: 'mg/L', min: 0, max: 10000, patterns: ['氨氮', 'nh3-n', 'ammonia'] },
+                        tn: { label: '总氮(TN)', unit: 'mg/L', min: 0, max: 10000, patterns: ['总氮', 'tn', 'total nitrogen'] },
+                        tp: { label: '总磷(TP)', unit: 'mg/L', min: 0, max: 1000, patterns: ['总磷', 'tp', 'total phosphorus'] },
+                        // 其他
+                        ss: { label: '悬浮物SS', unit: 'mg/L', min: 0, max: 100000, patterns: ['悬浮物', 'ss', 'suspended solids', 'mlss'] },
+                        tds: { label: 'TDS', unit: 'mg/L', min: 0, max: 100000, patterns: ['tds', '总溶解固体', '溶解性总固体'] },
+                        hardness: { label: '总硬度', unit: 'mg/L', min: 0, max: 5000, patterns: ['总硬度', '硬度', 'hardness'] }
+                    };
+                },
+                
+                // 单位转换配置
+                getUnitConversions() {
+                    return {
+                        turbidity: { 'ntu': 1, '度': 1, 'ntu度': 1 },
+                        tss: { 'mg/l': 1, 'mg/l': 1 },
+                        tds: { 'mg/l': 1, 'ppm': 1, 'g/l': 1000 },
+                        cod: { 'mg/l': 1 },
+                        bod: { 'mg/l': 1 },
+                        toc: { 'mg/l': 1 },
+                        color: { '倍': 1, '度': 1 },
+                        bacteria: { 'cfu/ml': 1, '个/ml': 1 },
+                        ammonia: { 'mg/l': 1 },
+                        tn: { 'mg/l': 1 },
+                        tp: { 'mg/l': 1 },
+                        ss: { 'mg/l': 1 },
+                        hardness: { 'mg/l': 1, 'mg/l(caco3)': 1, '德国度': 17.8 },
+                        calcium: { 'mg/l': 1 },
+                        magnesium: { 'mg/l': 1 },
+                        sodium: { 'mg/l': 1 },
+                        potassium: { 'mg/l': 1 },
+                        iron: { 'mg/l': 1 },
+                        manganese: { 'mg/l': 1 },
+                        barium_strontium: { 'mg/l': 1 },
+                        chloride: { 'mg/l': 1 },
+                        sulfate: { 'mg/l': 1 },
+                        nitrate: { 'mg/l': 1 },
+                        fluoride: { 'mg/l': 1 },
+                        bicarbonate: { 'mg/l': 1 },
+                        silica: { 'mg/l': 1 },
+                        conductivity: { 'μs/cm': 1, 'us/cm': 1, 'μs·cm': 1, 'ms/cm': 1000 },
+                        orp: { 'mv': 1, 'v': 1000 },
+                        chlorine: { 'mg/l': 1 }
+                    };
+                },
+                
+                // 预编译的正则表达式模式 - 增强版支持更多格式
+                _paramPatterns: null,
+                getParamPatterns() {
+                    if (!this._paramPatterns) {
+                        const patterns = {
+                            ph: [
+                                /ph[值\s]*[:：=]\s*(\d+\.?\d*)/i, /ph\s*[:：=]\s*(\d+\.?\d*)/i,
+                                /酸碱度[\s]*[:：=]\s*(\d+\.?\d*)/i, /(\d+\.?\d*)\s*\(?\s*ph\s*\)?/i,
+                                /ph[\s]*值?[\s]*[=:]?\s*(\d+\.\d+)/i, /ph[值为]?\s*(\d+\.\d+)/i,
+                                /ph\s*值?\s*[为是]?\s*(\d+\.\d+)/i
+                            ],
+                            turbidity: [
+                                /浊度[\s]*[:：=]\s*(\d+\.?\d*)/i, /turbidity[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(\d+\.?\d*)\s*(?:ntu|度|NTU)/i, /浑浊度[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /浊度\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            temperature: [
+                                /水温[\s]*[:：=]\s*(\d+\.?\d*)/i, /温度[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /temperature[\s]*[:：=]\s*(\d+\.?\d*)/i, /(\d+\.?\d*)\s*[°℃]\s*c?/i,
+                                /(\d+\.?\d*)\s*摄氏度/i, /水温\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            cod: [
+                                /cod[\s]*[:：=]\s*(\d+\.?\d*)/i, /化学需氧量[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:cod|化学需氧量)/i, /cod[\s]*[=:]?\s*(\d+)/i,
+                                /cod\s*值?\s*[为是]?\s*(\d+\.?\d*)/i, /化学需氧量\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            bod: [
+                                /bod[5\s]*[:：=]\s*(\d+\.?\d*)/i, /bod5[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /生化需氧量[\s]*[:：=]\s*(\d+\.?\d*)/i, /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:bod|生化需氧量)/i,
+                                /bod[\s]*[=:]?\s*(\d+)/i, /bod5\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            ammonia: [
+                                /氨氮[\s]*[:：=]\s*(\d+\.?\d*)/i, /nh3[-\s]?n[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /ammonia[\s]*[:：=]\s*(\d+\.?\d*)/i, /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:氨氮|nh3)/i,
+                                /氨氮[\s]*[=:]?\s*(\d+\.?\d*)/i, /氨氮\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            tn: [
+                                /总氮[\s]*[:：=]\s*(\d+\.?\d*)/i, /tn[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /total\s*nitrogen[\s]*[:：=]\s*(\d+\.?\d*)/i, /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:总氮|tn)/i,
+                                /总氮[\s]*[=:]?\s*(\d+\.?\d*)/i, /总氮\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            tp: [
+                                /总磷[\s]*[:：=]\s*(\d+\.?\d*)/i, /tp[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /total\s*phosphorus[\s]*[:：=]\s*(\d+\.?\d*)/i, /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:总磷|tp)/i,
+                                /总磷[\s]*[=:]?\s*(\d+\.?\d*)/i, /总磷\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            ss: [
+                                /悬浮物[\s]*[:：=]\s*(\d+\.?\d*)/i, /ss[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /suspended\s*solids[\s]*[:：=]\s*(\d+\.?\d*)/i, /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:悬浮物|ss)/i,
+                                /悬浮物[\s]*[=:]?\s*(\d+\.?\d*)/i, /mlss[\s]*[=:]?\s*(\d+\.?\d*)/i,
+                                /悬浮物\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            tds: [
+                                /tds[\s]*[:：=]\s*(\d+\.?\d*)/i, /总溶解固体[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /溶解性总固体[\s]*[:：=]\s*(\d+\.?\d*)/i, /total\s*dissolved\s*solids[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:tds|总溶解固体)/i, /tds[\s]*[=:]?\s*(\d+)/i,
+                                /tds\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            chlorine: [
+                                /余氯[\s]*[:：=]\s*(\d+\.?\d*)/i, /游离氯[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /chlorine[\s]*[:：=]\s*(\d+\.?\d*)/i, /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:余氯|游离氯)/i,
+                                /余氯[\s]*[=:]?\s*(\d+\.?\d*)/i, /cl[\s]*[=:]?\s*(\d+\.?\d*)\s*mg/i,
+                                /余氯\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            sdi: [
+                                /sdi[\s]*[:：=]\s*(\d+\.?\d*)/i, /污染指数[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /silt\s*density\s*index[\s]*[:：=]\s*(\d+\.?\d*)/i, /(?:^|\s)(\d+\.?\d*)\s*(?:sdi|污染指数)/i,
+                                /sdi[\s]*[=:]?\s*(\d+\.?\d*)/i, /sdi\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            hardness: [
+                                /总硬度[\s]*[:：=]\s*(\d+\.?\d*)/i, /硬度[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /hardness[\s]*[:：=]\s*(\d+\.?\d*)/i, /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:总硬度|硬度)/i,
+                                /总硬度[\s]*[=:]?\s*(\d+\.?\d*)/i, /硬度\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            calcium: [
+                                /钙离子[\s]*[:：=]\s*(\d+\.?\d*)/i, /ca[\s]*\+?[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /calcium[\s]*[:：=]\s*(\d+\.?\d*)/i, /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:钙离子|ca\s*\+?)/i,
+                                /钙[\s]*[=:]?\s*(\d+\.?\d*)/i, /ca2?[\+\s]*[=:]?\s*(\d+\.?\d*)/i,
+                                /钙离子\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            conductivity: [
+                                /电导率[\s]*[:：=]\s*(\d+\.?\d*)/i, /conductivity[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(\d+\.?\d*)\s*(?:μs\/cm|us\/cm|μs·cm)/i, /电导率[\s]*[=:]?\s*(\d+\.?\d*)/i,
+                                /电导率\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            iron: [
+                                /铁[\s]*[:：=]\s*(\d+\.?\d*)/i, /fe[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /总铁[\s]*[:：=]\s*(\d+\.?\d*)/i, /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:铁|fe)/i,
+                                /铁\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            manganese: [
+                                /锰[\s]*[:：=]\s*(\d+\.?\d*)/i, /mn[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:锰|mn)/i, /锰\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            // 新增阳离子
+                            magnesium: [
+                                /镁[\s]*[:：=]\s*(\d+\.?\d*)/i, /mg[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:镁|mg)/i, /镁\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            sodium: [
+                                /钠[\s]*[:：=]\s*(\d+\.?\d*)/i, /na[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:钠|na)/i, /钠\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            potassium: [
+                                /钾[\s]*[:：=]\s*(\d+\.?\d*)/i, /k[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:钾|k)/i, /钾\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            barium_strontium: [
+                                /钡[\s]*[:：=]\s*(\d+\.?\d*)/i, /锶[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /barium[\s]*[:：=]\s*(\d+\.?\d*)/i, /strontium[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:钡|锶|ba|sr)/i
+                            ],
+                            // 阴离子
+                            chloride: [
+                                /氯离子[\s]*[:：=]\s*(\d+\.?\d*)/i, /chloride[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:氯离子|cl)/i, /cl[-\s]*[=:]?\s*(\d+\.?\d*)/i
+                            ],
+                            sulfate: [
+                                /硫酸根[\s]*[:：=]\s*(\d+\.?\d*)/i, /sulfate[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:硫酸根|so4)/i, /so4[\s]*[=:]?\s*(\d+\.?\d*)/i
+                            ],
+                            nitrate: [
+                                /硝酸根[\s]*[:：=]\s*(\d+\.?\d*)/i, /nitrate[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:硝酸根|no3)/i, /no3[\s]*[=:]?\s*(\d+\.?\d*)/i
+                            ],
+                            fluoride: [
+                                /氟离子[\s]*[:：=]\s*(\d+\.?\d*)/i, /氟化物[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /fluoride[\s]*[:：=]\s*(\d+\.?\d*)/i, /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:氟|f)/i
+                            ],
+                            bicarbonate: [
+                                /重碳酸根[\s]*[:：=]\s*(\d+\.?\d*)/i, /碳酸氢根[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /bicarbonate[\s]*[:：=]\s*(\d+\.?\d*)/i, /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:hco3|碳酸氢)/i
+                            ],
+                            silica: [
+                                /二氧化硅[\s]*[:：=]\s*(\d+\.?\d*)/i, /硅[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /silica[\s]*[:：=]\s*(\d+\.?\d*)/i, /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:sio2|二氧化硅)/i
+                            ],
+                            // 有机/生物
+                            toc: [
+                                /toc[\s]*[:：=]\s*(\d+\.?\d*)/i, /总有机碳[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:toc|总有机碳)/i, /toc\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            color: [
+                                /色度[\s]*[:：=]\s*(\d+\.?\d*)/i, /color[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(?:^|\s)(\d+\.?\d*)\s*(?:倍|度)\s*(?:色度)?/i, /色度\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ],
+                            bacteria: [
+                                /细菌总数[\s]*[:：=]\s*(\d+\.?\d*)/i, /菌落总数[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(?:^|\s)(\d+\.?\d*)\s*(?:cfu\/ml|个\/ml)\s*(?:细菌|菌落)?/i
+                            ],
+                            // 安全性指标
+                            orp: [
+                                /orp[\s]*[:：=]\s*(-?\d+\.?\d*)/i, /氧化还原电位[\s]*[:：=]\s*(-?\d+\.?\d*)/i,
+                                /(?:^|\s)(-?\d+\.?\d*)\s*(?:mv|v)\s*(?:orp|氧化还原)?/i
+                            ],
+                            // 其他
+                            tss: [
+                                /tss[\s]*[:：=]\s*(\d+\.?\d*)/i, /总悬浮固体[\s]*[:：=]\s*(\d+\.?\d*)/i,
+                                /(?:^|\s)(\d+\.?\d*)\s*mg\/l\s*(?:tss|总悬浮固体)/i, /tss\s*值?\s*[为是]?\s*(\d+\.?\d*)/i
+                            ]
+                        };
+                        this._paramPatterns = patterns;
+                    }
+                    return this._paramPatterns;
+                },
+                
+                // 从文本内容中智能提取水质参数 - 增强版
+                extractWaterQualityFromText(text) {
+                    const result = { 
+                        inlet: {}, 
+                        outlet: {}, 
+                        analysis: '', 
+                        recommendations: '',
+                        parsedData: {}, // 带置信度的解析数据
+                        confidence: 0,  // 总体置信度
+                        source: 'text'
+                    };
+                    
+                    if (!text || typeof text !== 'string') {
+                        return result;
+                    }
+                    
+                    // 限制文本长度
+                    if (text.length > 500000) {
+                        text = text.substring(0, 500000);
+                    }
+                    
+                    // 首先尝试解析表格格式
+                    const tableData = this.parseTableFormat(text);
+                    if (Object.keys(tableData).length > 0) {
+                        Object.assign(result.parsedData, tableData);
+                    }
+                    
+                    // 然后使用正则表达式解析
+                    const regexData = this.parseWithRegex(text);
+                    // 合并数据，表格数据优先级更高
+                    Object.keys(regexData).forEach(key => {
+                        if (!result.parsedData[key]) {
+                            result.parsedData[key] = regexData[key];
+                        }
+                    });
+                    
+                    // 提取数值到inlet
+                    Object.keys(result.parsedData).forEach(key => {
+                        result.inlet[key] = result.parsedData[key].value;
+                    });
+                    
+                    // 计算总体置信度
+                    const confidences = Object.values(result.parsedData).map(d => d.confidence);
+                    result.confidence = confidences.length > 0 
+                        ? Math.round(confidences.reduce((a, b) => a + b, 0) / confidences.length)
+                        : 0;
+                    
+                    // 生成分析报告
+                    result.analysis = this.generateAnalysisReport(result.inlet);
+                    result.recommendations = this.generateRecommendations(result.inlet);
+                    
+                    return result;
+                },
+                
+                // 解析表格格式数据
+                parseTableFormat(text) {
+                    const result = {};
+                    const paramConfig = this.getParamConfig();
+                    
+                    // 尝试匹配各种表格格式
+                    // 格式1: 参数名 | 数值 | 单位
+                    // 格式2: 参数名: 数值 单位
+                    // 格式3: 参数名 数值 单位 (空格分隔)
+                    
+                    const lines = text.split(/[\n\r]+/).filter(line => line.trim());
+                    
+                    lines.forEach((line, lineIndex) => {
+                        // 尝试匹配 "参数名 数值 单位" 格式
+                        for (const [paramKey, config] of Object.entries(paramConfig)) {
+                            if (result[paramKey]) continue; // 已解析过
+                            
+                            // 构建匹配模式
+                            const patterns = config.patterns.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+                            const patternStr = patterns.join('|');
+                            
+                            // 匹配行中是否包含该参数
+                            const regex = new RegExp(`(?:${patternStr})[\s:：|=,，]*([\d.]+)[\s]*([a-zA-Zμ°/\\u4e00-\\u9fa5]*)`, 'i');
+                            const match = line.match(regex);
+                            
+                            if (match) {
+                                const value = parseFloat(match[1]);
+                                const detectedUnit = match[2] ? match[2].trim().toLowerCase() : config.unit;
+                                
+                                if (!isNaN(value) && value >= 0 && value < 1000000) {
+                                    // 单位转换
+                                    const convertedValue = this.convertUnit(value, detectedUnit, config.unit, paramKey);
+                                    
+                                    // 计算置信度
+                                    let confidence = 85;
+                                    if (detectedUnit && detectedUnit !== config.unit.toLowerCase()) {
+                                        confidence -= 10; // 单位不匹配降低置信度
+                                    }
+                                    if (lineIndex > 10) {
+                                        confidence -= 5; // 行数靠后降低置信度
+                                    }
+                                    
+                                    result[paramKey] = {
+                                        value: convertedValue,
+                                        originalValue: value,
+                                        unit: config.unit,
+                                        detectedUnit: detectedUnit || config.unit,
+                                        confidence: Math.max(50, confidence),
+                                        source: 'table'
+                                    };
+                                }
+                            }
+                        }
+                    });
+                    
+                    return result;
+                },
+                
+                // 使用正则表达式解析
+                parseWithRegex(text) {
+                    const result = {};
+                    const paramPatterns = this.getParamPatterns();
+                    const paramConfig = this.getParamConfig();
+                    
+                    // 清理文本
+                    const cleanText = text.toLowerCase().replace(/[\t\n\r]+/g, ' ').replace(/\s+/g, ' ');
+                    
+                    for (const [field, patterns] of Object.entries(paramPatterns)) {
+                        if (result[field]) continue;
+                        
+                        const config = paramConfig[field];
+                        
+                        for (let i = 0; i < patterns.length; i++) {
+                            const match = cleanText.match(patterns[i]);
+                            if (match && match[1]) {
+                                const value = parseFloat(match[1]);
+                                
+                                if (!isNaN(value) && value >= 0 && value < 1000000) {
+                                    // 验证值是否在合理范围内
+                                    const isValidRange = !config || (value >= config.min && value <= config.max);
+                                    
+                                    if (isValidRange) {
+                                        // 计算置信度 - 模式越靠前置信度越高
+                                        let confidence = 95 - (i * 5);
+                                        
+                                        result[field] = {
+                                            value: value,
+                                            originalValue: value,
+                                            unit: config ? config.unit : '',
+                                            detectedUnit: config ? config.unit : '',
+                                            confidence: Math.max(60, confidence),
+                                            source: 'regex'
+                                        };
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    return result;
+                },
+                
+                // 单位转换
+                convertUnit(value, fromUnit, toUnit, paramType) {
+                    if (!fromUnit || !toUnit || fromUnit === toUnit) {
+                        return value;
+                    }
+                    
+                    const conversions = this.getUnitConversions();
+                    const paramConversions = conversions[paramType];
+                    
+                    if (!paramConversions) {
+                        return value;
+                    }
+                    
+                    const fromFactor = paramConversions[fromUnit.toLowerCase()] || 1;
+                    const toFactor = paramConversions[toUnit.toLowerCase()] || 1;
+                    
+                    return value * (fromFactor / toFactor);
+                },
+                
+                // 生成分析报告
+                generateAnalysisReport(inlet) {
+                    const parts = [];
+                    
+                    if (inlet.tds) {
+                        parts.push(inlet.tds > 1000 
+                            ? `进水TDS ${inlet.tds} mg/L，偏高，建议采用反渗透深度脱盐`
+                            : inlet.tds > 500 
+                                ? `进水TDS ${inlet.tds} mg/L，中等，适合RO反渗透处理`
+                                : `进水TDS ${inlet.tds} mg/L，较低`);
+                    }
+                    if (inlet.hardness && inlet.hardness > 300) {
+                        parts.push(`硬度较高 (${inlet.hardness} mg/L)，建议软化处理`);
+                    }
+                    if (inlet.sdi) {
+                        parts.push(inlet.sdi > 5 
+                            ? `SDI 超标 (${inlet.sdi})，需改善预处理`
+                            : `SDI 正常 (${inlet.sdi})，适合RO进水`);
+                    }
+                    if (inlet.cod && inlet.cod > 50) {
+                        parts.push(`COD 较高 (${inlet.cod} mg/L)，需加强预处理`);
+                    }
+                    if (inlet.turbidity && inlet.turbidity > 5) {
+                        parts.push(`浊度较高 (${inlet.turbidity} NTU)，需加强过滤`);
+                    }
+                    if (inlet.ammonia && inlet.ammonia > 5) {
+                        parts.push(`氨氮较高 (${inlet.ammonia} mg/L)，需考虑生物处理`);
+                    }
+                    
+                    return parts.join('；') || '已解析水质报告，请检查参数是否准确。';
+                },
+                
+                // 生成工艺建议
+                generateRecommendations(inlet) {
+                    const steps = ['多介质过滤'];
+                    
+                    if (inlet.turbidity > 10 || inlet.ss > 50) {
+                        steps.push('混凝沉淀');
+                    }
+                    
+                    steps.push('活性炭');
+                    
+                    if (inlet.hardness > 300 || inlet.calcium > 100) {
+                        steps.push('软化器');
+                    }
+                    
+                    steps.push('5μm保安过滤');
+                    
+                    if (inlet.tds > 300 || inlet.sdi > 3) {
+                        steps.push('RO反渗透');
+                    }
+                    
+                    if (inlet.tds > 1000) {
+                        steps.push('二级RO');
+                    }
+                    
+                    steps.push('消毒');
+                    
+                    return `建议工艺：${steps.join(' → ')}`;
+                },
+                
+                // 显示解析预览面板
+                showParsePreview(result) {
+                    const inlet = result.inlet || {};
+                    const paramCount = Object.keys(inlet).filter(k => !['missing_params','analysis','parse_error','raw_content'].includes(k)).length;
+                    
+                    // 检查是否有解析错误 - 显示错误面板而不是alert
+                    if (inlet.parse_error) {
+                        console.error('AI解析返回错误:', inlet.raw_content);
+                        this.aiParsePreview = {
+                            show: true,
+                            data: { parse_error: true, raw_content: inlet.raw_content },
+                            confidence: 0,
+                            source: 'error',
+                            missingParams: [],
+                            analysis: 'AI解析失败，无法识别图片中的水质参数'
+                        };
+                        return;
+                    }
+                    
+                    if (paramCount === 0) {
+                        this.aiParsePreview = {
+                            show: true,
+                            data: { no_params: true },
+                            confidence: 0,
+                            source: 'empty',
+                            missingParams: [],
+                            analysis: '未能识别出任何水质参数'
+                        };
+                        return;
+                    }
+                    
+                    this.aiParsePreview = {
+                        show: true,
+                        data: result.inlet,
+                        confidence: result.confidence,
+                        source: result.source,
+                        missingParams: result.missingParams || [],
+                        analysis: result.analysis || ''
+                    };
+                    
+                    // 滚动到预览区域
+                    this.$nextTick(() => {
+                        const previewEl = document.querySelector('.ai-result');
+                        if (previewEl) {
+                            previewEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    });
+                },
+                
+                // AI模拟估算缺失参数
+                simulateMissingParams() {
+                    const missing = this.aiParsePreview.missingParams;
+                    if (!missing || missing.length === 0) return;
+                    
+                    // 基于已有数据进行合理估算
+                    const currentData = this.aiParsePreview.data;
+                    const simulated = {};
+                    
+                    // 估算规则
+                    if (missing.includes('bod') && currentData.cod) {
+                        simulated.bod = { value: (currentData.cod.value * 0.4).toFixed(1), confidence: 70, unit: 'mg/L' };
+                    }
+                    if (missing.includes('toc') && currentData.cod) {
+                        simulated.toc = { value: (currentData.cod.value * 0.3).toFixed(1), confidence: 70, unit: 'mg/L' };
+                    }
+                    if (missing.includes('tds') && currentData.conductivity) {
+                        simulated.tds = { value: Math.round(currentData.conductivity.value * 0.65), confidence: 75, unit: 'mg/L' };
+                    }
+                    if (missing.includes('hardness') && (currentData.calcium || currentData.magnesium)) {
+                        const ca = currentData.calcium ? currentData.calcium.value : 0;
+                        const mg = currentData.magnesium ? currentData.magnesium.value : 0;
+                        if (ca || mg) {
+                            simulated.hardness = { value: Math.round(ca * 2.5 + mg * 4.12), confidence: 75, unit: 'mg/L' };
+                        }
+                    }
+                    if (missing.includes('ss') && currentData.turbidity) {
+                        simulated.ss = { value: Math.round(currentData.turbidity.value * 1.5), confidence: 65, unit: 'mg/L' };
+                    }
+                    if (missing.includes('tss') && currentData.ss) {
+                        simulated.tss = { value: currentData.ss.value, confidence: 80, unit: 'mg/L' };
+                    }
+                    if (missing.includes('orp') && currentData.ph) {
+                        // 根据pH估算ORP
+                        const ph = currentData.ph.value;
+                        if (ph < 7) simulated.orp = { value: Math.round(200 + (7 - ph) * 50), confidence: 60, unit: 'mV' };
+                        else simulated.orp = { value: Math.round(200 - (ph - 7) * 30), confidence: 60, unit: 'mV' };
+                    }
+                    if (missing.includes('barium_strontium')) {
+                        simulated.barium_strontium = { value: 0.05, confidence: 50, unit: 'mg/L' };
+                    }
+                    if (missing.includes('color') && currentData.turbidity) {
+                        simulated.color = { value: Math.round(currentData.turbidity.value * 2), confidence: 60, unit: '倍' };
+                    }
+                    if (missing.includes('bacteria')) {
+                        simulated.bacteria = { value: 100, confidence: 40, unit: 'CFU/mL' };
+                    }
+                    if (missing.includes('magnesium') && currentData.calcium) {
+                        simulated.magnesium = { value: (currentData.calcium.value * 0.3).toFixed(1), confidence: 60, unit: 'mg/L' };
+                    }
+                    if (missing.includes('potassium') && currentData.sodium) {
+                        simulated.potassium = { value: (currentData.sodium.value * 0.1).toFixed(1), confidence: 55, unit: 'mg/L' };
+                    }
+                    if (missing.includes('bicarbonate') && currentData.ph && currentData.calcium) {
+                        simulated.bicarbonate = { value: Math.round(currentData.calcium.value * 1.5), confidence: 60, unit: 'mg/L' };
+                    }
+                    if (missing.includes('silica')) {
+                        simulated.silica = { value: 15, confidence: 45, unit: 'mg/L' };
+                    }
+                    
+                    // 合并模拟数据到预览数据
+                    Object.assign(this.aiParsePreview.data, simulated);
+                    
+                    // 更新缺失参数列表
+                    const stillMissing = missing.filter(m => !simulated[m]);
+                    this.aiParsePreview.missingParams = stillMissing;
+                    
+                    // 显示提示
+                    const simulatedCount = Object.keys(simulated).length;
+                    if (simulatedCount > 0) {
+                        alert(`已模拟估算 ${simulatedCount} 个参数，置信度较低仅供参考。\n\n仍缺失参数：${stillMissing.length > 0 ? stillMissing.join('、') : '无'}\n\n建议：请根据实际情况手动补充或确认。`);
+                    } else {
+                        alert('无法根据现有数据估算缺失参数，请手动输入。');
+                    }
+                },
+                
+                // 获取参数显示名称
+                getParamLabel(key) {
+                    const config = this.getParamConfig();
+                    return config[key] ? config[key].label : key;
+                },
+                
+                // 获取置信度颜色
+                getConfidenceColor(confidence) {
+                    if (confidence >= 90) return '#22c55e'; // 绿色
+                    if (confidence >= 70) return '#eab308'; // 黄色
+                    return '#ef4444'; // 红色
+                },
+                
+                // 移除解析的参数
+                removeParsedParam(key) {
+                    delete this.aiParsePreview.data[key];
+                    // 重新计算置信度
+                    const confidences = Object.values(this.aiParsePreview.data).map(d => d.confidence);
+                    this.aiParsePreview.confidence = confidences.length > 0 
+                        ? Math.round(confidences.reduce((a, b) => a + b, 0) / confidences.length)
+                        : 0;
+                },
+                
+                // 滚动到文本粘贴区域
+                scrollToTextPaste() {
+                    this.cancelParsePreview();
+                    this.$nextTick(() => {
+                        const pasteArea = document.querySelector('textarea[placeholder*="水质报告"]');
+                        if (pasteArea) {
+                            pasteArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            pasteArea.focus();
+                        }
+                    });
+                },
+                
+                // 应用解析结果
+                applyParsedData() {
+                    const data = this.aiParsePreview.data;
+                    const inlet = {};
+                    
+                    // 提取数值 - 过滤掉非参数字段
+                    const validParams = [
+                        'ph', 'turbidity', 'sdi', 'conductivity', 'tss', 'temperature',
+                        'calcium', 'magnesium', 'sodium', 'potassium', 'iron', 'manganese', 'barium_strontium',
+                        'chloride', 'sulfate', 'nitrate', 'fluoride', 'bicarbonate', 'silica',
+                        'cod', 'bod', 'toc', 'color', 'bacteria',
+                        'chlorine', 'orp',
+                        'ammonia', 'tn', 'tp',
+                        'ss', 'tds', 'hardness'
+                    ];
+                    
+                    Object.keys(data).forEach(key => {
+                        // 只处理有效的水质参数
+                        if (validParams.includes(key) && data[key] && typeof data[key] === 'object' && data[key].value !== undefined) {
+                            const value = parseFloat(data[key].value);
+                            if (!isNaN(value)) {
+                                inlet[key] = value;
+                            }
+                        }
+                    });
+                    
+                    // 应用到表单
+                    Object.assign(this.waterQuality.inlet, inlet);
+                    
+                    // 生成分析报告
+                    const result = {
+                        inlet: inlet,
+                        analysis: this.generateAnalysisReport(inlet),
+                        recommendations: this.generateRecommendations(inlet)
+                    };
+                    
+                    this.applyAIResult(result);
+                    
+                    // 隐藏预览
+                    this.aiParsePreview.show = false;
+                    
+                    // 显示成功提示
+                    const count = Object.keys(inlet).length;
+                    if (count > 0) {
+                        alert(`成功应用 ${count} 个水质参数！`);
+                    } else {
+                        alert('未能识别到有效的水质参数，请检查数据格式或手动输入。');
+                    }
+                },
+                
+                // 取消解析预览
+                cancelParsePreview() {
+                    this.aiParsePreview.show = false;
+                    this.aiParsePreview.data = {};
+                    this.aiParsePreview.confidence = 0;
+                },
+                
+                // 模拟Gemini分析结果（现在使用智能解析）
+                simulateGeminiAnalysis(inletContent, outletContent) {
+                    // 使用智能文本解析提取水质参数
+                    const inletResult = this.extractWaterQualityFromText(inletContent);
+                    const outletResult = outletContent ? this.extractWaterQualityFromText(outletContent) : { inlet: {} };
+                    
+                    return {
+                        inlet: inletResult.inlet,
+                        outlet: outletResult.inlet,
+                        analysis: inletResult.analysis,
+                        recommendations: inletResult.recommendations
+                    };
+                },
+                // 应用AI分析结果到表单
+                applyAIResult(result) {
+                    if (result.inlet) {
+                        Object.assign(this.waterQuality.inlet, result.inlet);
+                    }
+                    if (result.outlet) {
+                        Object.assign(this.waterQuality.outlet, result.outlet);
+                    }
+                    
+                    // 生成分析报告
+                    let analysisHtml = '<p><strong>进水水质评估：</strong></p><ul>';
+                    const inlet = this.waterQuality.inlet;
+                    
+                    if (inlet.tds > 1000) analysisHtml += `<li>TDS 偏高 (${inlet.tds} mg/L)，建议采用反渗透深度脱盐</li>`;
+                    else if (inlet.tds > 500) analysisHtml += `<li>TDS 中等 (${inlet.tds} mg/L)，适合RO反渗透处理</li>`;
+                    
+                    if (inlet.cod > 50) analysisHtml += `<li>COD 较高 (${inlet.cod} mg/L)，需加强预处理</li>`;
+                    if (inlet.hardness > 300) analysisHtml += `<li>硬度较高 (${inlet.hardness} mg/L)，建议软化处理</li>`;
+                    if (inlet.sdi > 5) analysisHtml += `<li>SDI 超标 (${inlet.sdi})，需改善预处理</li>`;
+                    else analysisHtml += `<li>SDI 正常 (${inlet.sdi})，适合RO进水</li>`;
+                    
+                    analysisHtml += '</ul>';
+                    analysisHtml += `<p><strong>AI推荐工艺：</strong>${result.recommendations || '多介质过滤 → 活性炭 → 保安过滤 → RO → 消毒'}</p>`;
+                    analysisHtml += `<p><strong>分析结论：</strong>${result.analysis || '水质适合采用RO反渗透工艺'}</p>`;
+                    
+                    this.aiAnalysisResult = analysisHtml;
+                },
+                // 旧版分析函数保留兼容
+                analyzeReports() {
+                    this.analyzeReportsWithGemini();
+                },
+                applyStandard() {
+                    const standards = {
+                        gb5749: { ph: '6.5-8.5', turbidity: 1, cod: 3, bod: '', ammonia: 0.5, tn: '', tp: '', ss: '', tds: 1000 },
+                        gb18918_1a: { ph: '6-9', turbidity: '', cod: 50, bod: 10, ammonia: 5, tn: 15, tp: 0.5, ss: 10, tds: '' },
+                        ro_feed: { ph: '4-11', turbidity: 1, cod: '', bod: '', ammonia: '', tn: '', tp: '', ss: 5, tds: '', chlorine: 0.1 }
+                    };
+                    const s = standards[this.waterQuality.outlet.standard];
+                    if (s) Object.assign(this.waterQuality.outlet, s);
+                },
+                // 统一的选择处理方法
+                selectItem(type, item) {
+                    const map = {
+                        membrane: 'selectedMembrane',
+                        uf: 'selectedUFMembrane',
+                        nf: 'selectedNFMembrane',
+                        pump: 'selectedPump'
+                    };
+                    const key = map[type];
+                    if (key) this[key] = item.model;
+                },
+                // 保持向后兼容的别名方法
+                selectMembrane(mem) { this.selectItem('membrane', mem); },
+                selectUFMembrane(mem) { this.selectItem('uf', mem); },
+                selectNFMembrane(mem) { this.selectItem('nf', mem); },
+                runAIAnalysis() {
+                    this.perfStart('aiAnalysis');
+                    this.aiRunning = true;
+                    
+                    // 使用requestIdleCallback在浏览器空闲时执行（如果可用）
+                    const runAnalysis = () => {
+                        const inlet = this.waterQuality.inlet;
+                        const feed = parseFloat(this.designFlow.feed) || 0;
+                        
+                        // 使用数组join替代字符串拼接，性能更好
+                        const parts = [
+                            '<p><strong>系统运行预测分析：</strong></p><ul>',
+                            '<li><strong>膜污染风险评估：</strong>中等（进水 SDI ', inlet.sdi || '未知', '）</li>',
+                            '<li><strong>结垢倾向：</strong>', inlet.hardness > 200 ? '高' : '低', '</li>',
+                            '<li><strong>化学清洗周期预估：</strong>3-6个月</li>',
+                            '<li><strong>膜寿命预估：</strong>3-5年</li>',
+                            '<li><strong>能耗估算：</strong>', (feed * 0.5).toFixed(1), ' kWh/m³</li></ul>',
+                            '<p><strong>优化建议：</strong>建议配置自动加药系统，定期监测进水水质变化。</p>'
+                        ];
+                        
+                        this.aiAnalysis = parts.join('');
+                        this.aiRunning = false;
+                        this.perfEnd('aiAnalysis');
+                    };
+                    
+                    // 模拟异步处理，使用更短的延迟提升响应感
+                    setTimeout(runAnalysis, 500);
+                },
+                selectPump(pump) { this.selectItem('pump', pump); },
+                resetAll() {
+                    if (confirm('确定要重置所有数据吗？')) {
+                        this.currentStep = 0;
+                        this.waterQuality = { 
+                            inlet: { 
+                                // 基础理化
+                                ph: '', turbidity: '', sdi: '', conductivity: '', tss: '', temperature: 25,
+                                // 阳离子
+                                calcium: '', magnesium: '', sodium: '', potassium: '', iron: '', manganese: '', barium_strontium: '',
+                                // 阴离子
+                                chloride: '', sulfate: '', nitrate: '', fluoride: '', bicarbonate: '', silica: '',
+                                // 有机/生物
+                                cod: '', bod: '', toc: '', color: '', bacteria: '',
+                                // 安全性指标
+                                chlorine: '', orp: '',
+                                // 营养盐
+                                ammonia: '', tn: '', tp: '',
+                                // 其他
+                                ss: '', tds: '', hardness: ''
+                            },
+                            outlet: { standard: 'custom', ph: '', turbidity: '', cod: '', bod: '', ammonia: '', tn: '', tp: '', ss: '', tds: '' }
+                        };
+                        this.designFlow = { feed: 50, permeate: 35, recovery: 70 };
+                        this.selectedMembrane = ''; 
+                        this.selectedPump = ''; 
+                        this.selectedUFMembrane = '';
+                        this.selectedNFMembrane = '';
+                        this.aiAnalysisResult = ''; 
+                        this.aiAnalysis = '';
+                        this.inletReport = null;
+                        this.outletReport = null;
+                        this.pastedReportText = '';
+                        this.processConfig = {
+                            pretreatment: 'multimedia+carbon',
+                            precisionFilter: '5um',
+                            ufSystem: 'none',
+                            mainProcess: 'ro'
+                        };
+                    }
+                },
+                exportDesign() {
+                    const design = { 
+                        waterQuality: this.waterQuality, 
+                        designFlow: this.designFlow, 
+                        membrane: this.selectedMembrane,
+                        ufMembrane: this.selectedUFMembrane,
+                        nfMembrane: this.selectedNFMembrane,
+                        pump: this.selectedPump, 
+                        config: this.config,
+                        processConfig: this.processConfig,
+                        timestamp: new Date().toISOString() 
+                    };
+                    const blob = new Blob([JSON.stringify(design, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a'); a.href = url; a.download = 'wave-design-' + Date.now() + '.json'; a.click(); URL.revokeObjectURL(url);
+                    alert('设计方案已导出！');
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

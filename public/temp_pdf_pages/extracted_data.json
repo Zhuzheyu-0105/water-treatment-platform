@@ -1,0 +1,26 @@
+{
+  "report_info": {
+    "title": "物产中水检测报告",
+    "sample_name": "废水",
+    "sampling_date": "2025年",
+    "report_number": "25A0124130W01",
+    "test_organization": "浙江中大新晟科技有限公司"
+  },
+  "inlet_water_quality": {
+    "ph": 7.7,
+    "ss": 5,
+    "ammonia": 0.258,
+    "tp": 0.24,
+    "color": 5,
+    "anion_surfactant": 0.103,
+    "iron": 0.30,
+    "manganese": 0.01,
+    "chlorine": 0.04,
+    "hardness": 248,
+    "bicarbonate": 387,
+    "petroleum": 0.52,
+    "bod": 3.1,
+    "cod": 9
+  },
+  "analysis_notes": "这是一份中水/再生水水质检测报告，进水为处理后的废水。各项指标符合城市杂用水标准。"
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "page": 1,
+    "content": "```json\n{\n  \"page_number\": 1,\n  \"content_summary\": \"本页是水质检测报告的第1页，包含检测报告的标题、报告编号、检测类别、样品名称、委托单位以及检测机构信息。\",\n  \"parameters\": []\n}\n```"
+  },
+  {
+    "page": 2,
+    "content": "```json\n{\n  \"page_number\": 2,\n  \"content_summary\": \"本页主要内容为检测报告说明，包括对检测结果异议的处理方式、样品检验的责任归属、报告的有效性条件以及报告使用的限制。同时提供了检测机构的地址、邮编、电话和邮箱等联系方式。\",\n  \"parameters\": []\n}\n``` \n\n说明：由于该页面内容为检测报告说明，并未包含具体的水质参数，因此参数列表为空。"
+  },
+  {
+    "page": 3,
+    "content": "```json\n{\n  \"page_number\": 3,\n  \"content_summary\": \"本页主要内容为废水的水质检测项目、检测依据和设备名称的列表，包括pH值、悬浮物、氨氮、总磷、石油类、色度、阴离子表面活性剂、总锰、总铁、游离氯、总硬度和总碱度等参数的检测方法和设备。\",\n  \"parameters\": [\n    {\"name\": \"pH值\", \"value\": \"\", \"unit\": \"\"},\n    {\"name\": \"悬浮物\", \"value\": \"\", \"unit\": \"\"},\n    {\"name\": \"氨氮\", \"value\": \"\", \"unit\": \"\"},\n    {\"name\": \"总磷\", \"value\": \"\", \"unit\": \"\"},\n    {\"name\": \"石油类\", \"value\": \"\", \"unit\": \"\"},\n    {\"name\": \"色度\", \"value\": \"\", \"unit\": \"\"},\n    {\"name\": \"阴离子表面活性剂\", \"value\": \"\", \"unit\": \"\"},\n    {\"name\": \"总锰、总铁\", \"value\": \"\", \"unit\": \"\"},\n    {\"name\": \"游离氯\", \"value\": \"\", \"unit\": \"\"},\n    {\"name\": \"总硬度\", \"value\": \"\", \"unit\": \"\"},\n    {\"name\": \"总碱度\", \"value\": \"\", \"unit\": \"\"}\n  ]\n}\n```\n\n**注意：** 由于图片中并未直接显示具体的检测数值，因此在`parameters`字段中，`value`和`unit`字段均为空。"
+  },
+  {
+    "page": 4,
+    "content": "```json\n{\n  \"page_number\": 2,\n  \"content_summary\": \"本页主要内容为废水检测结果，包括采样日期、样品编号、样品性状、检测点位以及多个水质参数的检测结果。\",\n  \"parameters\": [\n    {\"name\": \"pH值\", \"value\": \"7.7\", \"unit\": \"无量纲\"},\n    {\"name\": \"悬浮物\", \"value\": \"5\", \"unit\": \"mg/L\"},\n    {\"name\": \"氨氮\", \"value\": \"0.258\", \"unit\": \"mg/L\"},\n    {\"name\": \"总磷\", \"value\": \"0.24\", \"unit\": \"mg/L\"},\n    {\"name\": \"色度\", \"value\": \"5\", \"unit\": \"倍\"},\n    {\"name\": \"阴离子表面活性剂\", \"value\": \"0.103\", \"unit\": \"mg/L\"},\n    {\"name\": \"总铁\", \"value\": \"0.30\", \"unit\": \"mg/L\"},\n    {\"name\": \"总锰\", \"value\": \"<0.01\", \"unit\": \"mg/L\"},\n    {\"name\": \"游离氯\", \"value\": \"0.04\", \"unit\": \"mg/L\"},\n    {\"name\": \"总硬度\", \"value\": \"248\", \"unit\": \"mg/L\"},\n    {\"name\": \"总碱度\", \"value\": \"387\", \"unit\": \"mg/L\"},\n    {\"name\": \"石油类\", \"value\": \"0.52\", \"unit\": \"mg/L\"}\n  ]\n}\n```"
+  },
+  {
+    "page": 5,
+    "content": "```json\n{\n  \"page_number\": 5,\n  \"content_summary\": \"本页为水质检测报告的封面，包含检测报告的标题、报告编号、检测类别、样品名称、委托单位等信息，以及检测机构的名称和印章。\",\n  \"parameters\": []\n}\n```"
+  },
+  {
+    "page": 6,
+    "content": "```json\n{\n  \"page_number\": 6,\n  \"content_summary\": \"本页主要内容为检测报告的说明，包括对检测结果异议的处理、样品检验的责任归属、报告的有效性条件、报告的复制限制以及报告数据使用的限制。同时提供了检测机构的地址、邮编、电话和邮箱等联系方式。\",\n  \"parameters\": []\n}\n```"
+  },
+  {
+    "page": 7,
+    "content": "```json\n{\n  \"page_number\": 1,\n  \"content_summary\": \"本页是水质检测报告的第1页，包含样品信息、检测项目、检测依据和设备名称等信息。\",\n  \"parameters\": [\n    {\n      \"name\": \"硫酸盐\",\n      \"value\": \"\",\n      \"unit\": \"\"\n    },\n    {\n      \"name\": \"粪大肠菌群\",\n      \"value\": \"\",\n      \"unit\": \"\"\n    },\n    {\n      \"name\": \"浊度\",\n      \"value\": \"\",\n      \"unit\": \"\"\n    },\n    {\n      \"name\": \"总氯\",\n      \"value\": \"\",\n      \"unit\": \"\"\n    },\n    {\n      \"name\": \"可滤残渣\",\n      \"value\": \"\",\n      \"unit\": \"\"\n    }\n  ]\n}\n```"
+  },
+  {
+    "page": 9,
+    "content": "```json\n{\n  \"page_number\": 9,\n  \"content_summary\": \"本页主要内容为水质检测报告的封面信息，包括报告编号、检测类别、样品名称、委托单位等基本信息。\",\n  \"parameters\": []\n}\n```"
+  },
+  {
+    "page": 10,
+    "content": "```json\n{\n  \"page_number\": 10,\n  \"content_summary\": \"本页主要内容是关于水质检测报告的说明，包括对检测结果有异议的处理方式、报告的有效性条件、报告的使用限制以及公司的联系方式等。\",\n  \"parameters\": []\n}\n```"
+  },
+  {
+    "page": 11,
+    "content": "```json\n{\n  \"page_number\": 11,\n  \"content_summary\": \"本页主要内容为水质检测报告，包括检测项目、检测依据、设备名称以及检测结果。检测项目包括五日生化需氧量和化学需氧量。\",\n  \"parameters\": [\n    {\n      \"name\": \"五日生化需氧量\",\n      \"value\": \"3.1\",\n      \"unit\": \"mg/L\"\n    },\n    {\n      \"name\": \"化学需氧量\",\n      \"value\": \"9\",\n      \"unit\": \"mg/L\"\n    }\n  ]\n}\n```"
+  }
+]
