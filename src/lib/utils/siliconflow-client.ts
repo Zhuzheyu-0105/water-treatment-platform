@@ -46,31 +46,27 @@ export class SiliconFlowClient {
     this.baseUrl = baseUrl;
   }
 
-  /**
-   * 调用硅基流动API (非流式)
-   */
-  async invoke(options: InvokeOptions): Promise<{ content: string; usage: ChatCompletionResponse['usage'] }> {
-    const { model, messages, temperature = 0.7, max_tokens = 4096 } = options;
-
-    // 转换消息格式（处理图片消息）
-    const formattedMessages = messages.map(msg => {
-      if (typeof msg.content === 'string') {
-        return msg;
-      }
-      // 处理图片消息 - 硅基流动使用 OpenAI 兼容格式
+  private formatMessages(messages: ChatMessage[]) {
+    return messages.map(msg => {
+      if (typeof msg.content === 'string') return msg;
       return {
         role: msg.role,
         content: msg.content.map(item => {
           if (item.type === 'image_url') {
-            return {
-              type: 'image_url' as const,
-              image_url: { url: item.image_url?.url || '' }
-            };
+            return { type: 'image_url' as const, image_url: { url: item.image_url?.url || '' } };
           }
           return item;
         })
       };
     });
+  }
+
+  /**
+   * 调用硅基流动API (非流式)
+   */
+  async invoke(options: InvokeOptions): Promise<{ content: string; usage: ChatCompletionResponse['usage'] }> {
+    const { model, messages, temperature = 0.7, max_tokens = 4096 } = options;
+    const formattedMessages = this.formatMessages(messages);
 
     const response = await fetch(`${this.baseUrl}/chat/completions`, {
       method: 'POST',
@@ -105,25 +101,7 @@ export class SiliconFlowClient {
    */
   async *invokeStream(options: InvokeOptions): AsyncGenerator<string> {
     const { model, messages, temperature = 0.7, max_tokens = 4096 } = options;
-
-    // 转换消息格式
-    const formattedMessages = messages.map(msg => {
-      if (typeof msg.content === 'string') {
-        return msg;
-      }
-      return {
-        role: msg.role,
-        content: msg.content.map(item => {
-          if (item.type === 'image_url') {
-            return {
-              type: 'image_url' as const,
-              image_url: { url: item.image_url?.url || '' }
-            };
-          }
-          return item;
-        })
-      };
-    });
+    const formattedMessages = this.formatMessages(messages);
 
     const response = await fetch(`${this.baseUrl}/chat/completions`, {
       method: 'POST',

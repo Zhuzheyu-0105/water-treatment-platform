@@ -75,11 +75,9 @@ export function calculateOsmoticPressure(
   const T = 273 + temperature; // 绝对温度
   
   // 经验公式：渗透压与TDS成正比
-  // 对于NaCl溶液：TDS=35000 mg/L时，渗透压≈27 bar
-  // 系数约为 0.77 bar per 1000 ppm
-  // 温度修正：渗透压与绝对温度成正比
-  
-  const baseOsmoticPressure = (tds / 1000) * 0.77;
+  // 对于标准水质：TDS=1000 mg/L时，渗透压≈0.711 bar（25℃）
+  // 与 filter-simulation.ts 统一使用 0.711 系数
+  const baseOsmoticPressure = (tds / 1000) * 0.711;
   const temperatureCorrection = T / 298; // 25℃为基准
   
   return baseOsmoticPressure * temperatureCorrection;

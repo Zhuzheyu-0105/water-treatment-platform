@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 import {
   Droplets,
@@ -10,7 +11,6 @@ import {
   FileCheck,
   ChevronRight,
   ChevronLeft,
-  House,
   Sun,
   Moon
 } from 'lucide-react';
@@ -43,11 +43,8 @@ export function DashboardSidebar({
   onCollapsedChange
 }: DashboardSidebarProps) {
   const [hoveredItem, setHoveredItem] = useState<number | null>(null);
-  const [isDark, setIsDark] = useState(false);
-
-  const handleStepClick = (step: number) => {
-    onStepChange(step);
-  };
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === 'dark';
 
   return (
     <aside
@@ -91,7 +88,7 @@ export function DashboardSidebar({
           return (
             <button
               key={item.id}
-              onClick={() => handleStepClick(stepIndex)}
+              onClick={() => onStepChange(stepIndex)}
               onMouseEnter={() => setHoveredItem(index)}
               onMouseLeave={() => setHoveredItem(null)}
               className={cn(
@@ -156,7 +153,7 @@ export function DashboardSidebar({
 
         {/* Theme Toggle */}
         <button
-          onClick={() => setIsDark(!isDark)}
+          onClick={() => setTheme(isDark ? 'light' : 'dark')}
           className={cn(
             'flex items-center justify-center h-10 rounded-xl transition-all duration-200',
             'text-[#86868B] hover:bg-[#E8E8ED] dark:hover:bg-[#2D2D2F] dark:text-[#98989D]',
@@ -187,7 +184,7 @@ export function DashboardSidebar({
             </div>
             <div className="flex flex-col">
               <span className="text-[#1D1D1F] dark:text-white text-[13px] font-medium">设计师</span>
-              <span className="text-[#86868B] dark:text-[#98989D] text-[10px]">v3.5</span>
+              <span className="text-[#86868B] dark:text-[#98989D] text-[10px]">v4.0</span>
             </div>
           </div>
         )}

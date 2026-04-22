@@ -10,7 +10,7 @@ interface WaterQualityParam {
 }
 
 interface ParseResult {
-  [key: string]: any;
+  [key: string]: unknown;
   missing_params?: string[];
   analysis?: string;
   parse_error?: boolean;

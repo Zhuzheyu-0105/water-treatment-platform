@@ -13,6 +13,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 文件类型白名单
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf', 'text/plain'];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        { error: '不支持的文件类型，仅允许图片、PDF 和文本文件' },
+        { status: 400 }
+      );
+    }
+
+    // 文件大小限制：20MB
+    const MAX_SIZE = 20 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json(
+        { error: '文件过大，请上传 20MB 以内的文件' },
+        { status: 400 }
+      );
+    }
+
     // 检查存储配置
     const endpointUrl = process.env.COS_ENDPOINT_URL || process.env.COZE_BUCKET_ENDPOINT_URL;
     const accessKey = process.env.COS_SECRET_ID || process.env.COZE_ACCESS_KEY;

@@ -86,8 +86,8 @@ export async function POST(request: NextRequest) {
     };
 
     // 构建工艺单元列表
-    const units: ProcessUnit[] = processUnits.map((unit: any) => ({
-      type: unit.unitType || unit.type,  // 兼容 unitType 和 type 两种字段名
+    const units: ProcessUnit[] = processUnits.map((unit: { unitType?: string; type?: string; name?: string; params?: Record<string, unknown>; config?: Record<string, unknown> }) => ({
+      type: unit.unitType || unit.type,
       name: unit.name,
       params: unit.params || {},
       config: unit.config || {}
@@ -243,38 +243,8 @@ export async function POST(request: NextRequest) {
       issues: simulationResult.issues,
       recommendations: simulationResult.recommendations,
 
-      // 水质符合性评估（自动计算出水能符合哪些标准）
-      complianceAssessment: (() => {
-        const complianceResults = assessCompliance({
-          tds: simulationResult.finalWater.tds,
-          turbidity: simulationResult.finalWater.turbidity,
-          cod: simulationResult.finalWater.cod,
-          hardness: simulationResult.finalWater.hardness,
-          conductivity: simulationResult.finalWater.conductivity
-        });
-        
-        // 分类结果
-        const fullyCompliant = complianceResults.filter(r => r.compliance === 'full');
-        const partiallyCompliant = complianceResults.filter(r => r.compliance === 'partial');
-        
-        return {
-          fullyCompliant: fullyCompliant.slice(0, 5).map(r => ({
-            standardId: r.standard.id,
-            standardName: r.standard.name,
-            typicalApplication: r.standard.typicalApplication
-          })),
-          partiallyCompliant: partiallyCompliant.slice(0, 3).map(r => ({
-            standardId: r.standard.id,
-            standardName: r.standard.name,
-            issues: r.issues
-          })),
-          summary: fullyCompliant.length > 0 
-            ? `该工艺出水可达到 ${fullyCompliant[0].standard.name} 标准`
-            : partiallyCompliant.length > 0
-              ? `该工艺出水部分指标可达到 ${partiallyCompliant[0].standard.name} 标准`
-              : '该工艺出水未能符合已知标准'
-        };
-      })(),
+      // 水质符合性评估
+      complianceAssessment: buildComplianceAssessment(simulationResult.finalWater),
 
       // 膜污染风险评估
       foulingRisk: foulingAssessment,
@@ -317,8 +287,37 @@ export async function POST(request: NextRequest) {
   }
 }
 
+function buildComplianceAssessment(finalWater: WaterQuality) {
+  const complianceResults = assessCompliance({
+    tds: finalWater.tds,
+    turbidity: finalWater.turbidity,
+    cod: finalWater.cod,
+    hardness: finalWater.hardness,
+    conductivity: finalWater.conductivity
+  });
+  const fullyCompliant = complianceResults.filter(r => r.compliance === 'full');
+  const partiallyCompliant = complianceResults.filter(r => r.compliance === 'partial');
+  return {
+    fullyCompliant: fullyCompliant.slice(0, 5).map(r => ({
+      standardId: r.standard.id,
+      standardName: r.standard.name,
+      typicalApplication: r.standard.typicalApplication
+    })),
+    partiallyCompliant: partiallyCompliant.slice(0, 3).map(r => ({
+      standardId: r.standard.id,
+      standardName: r.standard.name,
+      issues: r.issues
+    })),
+    summary: fullyCompliant.length > 0
+      ? `该工艺出水可达到 ${fullyCompliant[0].standard.name} 标准`
+      : partiallyCompliant.length > 0
+        ? `该工艺出水部分指标可达到 ${partiallyCompliant[0].standard.name} 标准`
+        : '该工艺出水未能符合已知标准'
+  };
+}
+
 /**
- * 格式化水质数据用于输出 (v3.5 - 完整离子参数)
+ * 格式化水质数据用于输出
  */
 function formatWaterQuality(water: WaterQuality): Record<string, any> {
   const result: Record<string, any> = {
@@ -334,14 +333,14 @@ function formatWaterQuality(water: WaterQuality): Record<string, any> {
     magnesium: water.magnesium !== undefined ? roundTo(water.magnesium, 1) : undefined,
     sodium: water.sodium !== undefined ? roundTo(water.sodium, 1) : undefined,
     potassium: water.potassium !== undefined ? roundTo(water.potassium, 1) : undefined,
-    iron: roundTo(water.iron, 2),
-    manganese: roundTo(water.manganese, 2),
+    iron: water.iron !== undefined ? roundTo(water.iron, 2) : undefined,
+    manganese: water.manganese !== undefined ? roundTo(water.manganese, 2) : undefined,
     
     // 阴离子
     chloride: water.chloride !== undefined ? roundTo(water.chloride, 1) : undefined,
     sulfate: water.sulfate !== undefined ? roundTo(water.sulfate, 1) : undefined,
     bicarbonate: water.bicarbonate !== undefined ? roundTo(water.bicarbonate, 1) : undefined,
-    silica: roundTo(water.silica, 1),
+    silica: water.silica !== undefined ? roundTo(water.silica, 1) : undefined,
     nitrate: water.nitrate !== undefined ? roundTo(water.nitrate, 1) : undefined,
     fluoride: water.fluoride !== undefined ? roundTo(water.fluoride, 2) : undefined,
     
@@ -360,7 +359,7 @@ function formatWaterQuality(water: WaterQuality): Record<string, any> {
     tp: water.tp !== undefined ? roundTo(water.tp, 2) : undefined,
     
     // 其他
-    chlorine: roundTo(water.chlorine, 2),
+    chlorine: water.chlorine !== undefined ? roundTo(water.chlorine, 2) : undefined,
     sdi: water.sdi !== undefined ? roundTo(water.sdi, 1) : undefined,
     silt: water.silt !== undefined ? roundTo(water.silt, 1) : undefined,
     tss: water.tss !== undefined ? roundTo(water.tss, 1) : undefined,
@@ -389,7 +388,8 @@ function formatWaterQuality(water: WaterQuality): Record<string, any> {
 /**
  * 四舍五入到指定小数位
  */
-function roundTo(value: number, decimals: number): number {
+function roundTo(value: number | undefined, decimals: number): number | undefined {
+  if (value === undefined || value === null) return undefined;
   if (value === 0) return 0;
   const factor = Math.pow(10, decimals);
   return Math.round(value * factor) / factor;

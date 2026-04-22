@@ -2,31 +2,20 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-/**
- * localStorage 持久化 hook
- * 
- * @example
- * ```ts
- * const [design, setDesign] = useLocalStorage('design-data', defaultValue);
- * ```
- */
 export function useLocalStorage<T>(
   key: string,
   initialValue: T
 ): [T, (value: T | ((prev: T) => T)) => void] {
-  // 初始渲染统一使用 initialValue，避免 SSR hydration mismatch
+  // 始终用默认值初始化，保证 SSR 和首次客户端渲染一致，避免 hydration mismatch
   const [storedValue, setStoredValue] = useState<T>(initialValue);
 
-  // 客户端挂载后从 localStorage 读取已保存的值
+  // 客户端挂载后再从 localStorage 同步实际值
   useEffect(() => {
     try {
       const item = window.localStorage.getItem(key);
-      if (item) {
-        const parsed = JSON.parse(item);
-        setStoredValue(parsed);
-      }
-    } catch (error) {
-      console.warn(`读取 localStorage[${key}] 失败:`, error);
+      if (item) setStoredValue(JSON.parse(item) as T);
+    } catch {
+      // ignore
     }
   }, [key]);
 

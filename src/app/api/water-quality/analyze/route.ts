@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { LLMClient, Config, HeaderUtils } from 'coze-coding-dev-sdk';
-import { WaterQualityParams, classifyWaterQuality, roFeedLimits } from '@/lib/constants/water-quality';
+import { WaterQualityParams, classifyWaterQuality } from '@/lib/constants/water-quality';
 import { recommendMembraneCategory } from '@/lib/constants/membranes';
 
 export async function POST(request: NextRequest) {
@@ -34,23 +34,23 @@ export async function POST(request: NextRequest) {
     const prompt = `作为水处理系统设计专家，请分析以下水质数据并提供专业建议。
 
 ## 进水水质参数
-- pH: ${waterQuality.ph || '未检测'}
-- 浊度: ${waterQuality.turbidity || '未检测'} NTU
-- SDI₁₅: ${waterQuality.sdi || '未检测'}
-- 电导率: ${waterQuality.conductivity || '未检测'} μs/cm
-- TDS: ${waterQuality.tds || '未检测'} mg/L
-- 总硬度: ${waterQuality.hardness || '未检测'} mg/L
-- COD: ${waterQuality.cod || '未检测'} mg/L
-- 钙Ca²⁺: ${waterQuality.calcium || '未检测'} mg/L
-- 镁Mg²⁺: ${waterQuality.magnesium || '未检测'} mg/L
-- 钠Na⁺: ${waterQuality.sodium || '未检测'} mg/L
-- 氯离子Cl⁻: ${waterQuality.chloride || '未检测'} mg/L
-- 硫酸根SO₄²⁻: ${waterQuality.sulfate || '未检测'} mg/L
-- 二氧化硅SiO₂: ${waterQuality.silica || '未检测'} mg/L
-- 铁Fe: ${waterQuality.iron || '未检测'} mg/L
-- 锰Mn: ${waterQuality.manganese || '未检测'} mg/L
-- 余氯: ${waterQuality.chlorine || '未检测'} mg/L
-- 水温: ${waterQuality.temperature || 25} °C
+- pH: ${waterQuality.ph ?? '未检测'}
+- 浊度: ${waterQuality.turbidity ?? '未检测'} NTU
+- SDI₁₅: ${waterQuality.sdi ?? '未检测'}
+- 电导率: ${waterQuality.conductivity ?? '未检测'} μs/cm
+- TDS: ${waterQuality.tds ?? '未检测'} mg/L
+- 总硬度: ${waterQuality.hardness ?? '未检测'} mg/L
+- COD: ${waterQuality.cod ?? '未检测'} mg/L
+- 钙Ca²⁺: ${waterQuality.calcium ?? '未检测'} mg/L
+- 镁Mg²⁺: ${waterQuality.magnesium ?? '未检测'} mg/L
+- 钠Na⁺: ${waterQuality.sodium ?? '未检测'} mg/L
+- 氯离子Cl⁻: ${waterQuality.chloride ?? '未检测'} mg/L
+- 硫酸根SO₄²⁻: ${waterQuality.sulfate ?? '未检测'} mg/L
+- 二氧化硅SiO₂: ${waterQuality.silica ?? '未检测'} mg/L
+- 铁Fe: ${waterQuality.iron ?? '未检测'} mg/L
+- 锰Mn: ${waterQuality.manganese ?? '未检测'} mg/L
+- 余氯: ${waterQuality.chlorine ?? '未检测'} mg/L
+- 水温: ${waterQuality.temperature ?? 25} °C
 
 ## 设计参数
 - 进水量: ${designFlow?.feed ?? 50} m³/h
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
         param: '余氯',
         value: waterQuality.chlorine,
         limit: 0.1,
-        status: waterQuality.chlorine <= 0 ? 'pass' : waterQuality.chlorine <= 0.1 ? 'warning' : 'fail',
+        status: waterQuality.chlorine === 0 ? 'pass' : waterQuality.chlorine <= 0.1 ? 'warning' : 'fail',
         message: waterQuality.chlorine > 0.1 ? '余氯超标，需要脱氯处理，否则会氧化复合膜' : waterQuality.chlorine > 0 ? '有余氯，建议脱氯' : '符合RO进水要求'
       });
     }
